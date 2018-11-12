@@ -1,6 +1,6 @@
-function bind_rows(dflist)
-    vcat(dflist...)
-end
+# function bind_rows(dflist)
+#     vcat(dflist...)
+# end
 
 "Normalises a vector"
 function normalise(x)

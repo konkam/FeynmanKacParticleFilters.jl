@@ -1,6 +1,6 @@
 module FeynmanKacParticleFilters
 
-greet() = print("Hello World!")
+# greet() = print("Hello World!")
 
 include("generic_particle_filter_algorithm.jl")
 include("marginal_likelihood.jl")
