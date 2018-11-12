@@ -24,6 +24,31 @@ function generic_particle_filtering(Mt, Gt, N, RS)
 
 end
 
+function generic_particle_filtering_dict(Mt, Gt, N, RS)
+    times::Array{Float64, 1} = Mt |> keys |> collect |> sort
+    # Initialisation
+    # X = Array{Float64, 2}(undef, N,length(times))
+    X = dict()
+    w = Array{Float64, 2}(undef, N,length(times))
+    W = Array{Float64, 2}(undef, N,length(times))
+    A = Array{Int64, 1}(undef, N)
+    X[1] = rand(Mt[times[1]], N)
+    w[:,1] =  Gt[times[1]].(X[:,1])
+    W[:,1] = w[:,1] |> normalise
+
+    #Filtering
+    for t in 2:length(times)
+        time::Float64 = times[t]
+        A::Array{Int64, 1} = RS(W[:,t-1])
+        X[t] = Mt[time](X[A,t-1])
+        w[:,t] =  Gt[times[t]].(X[t])
+        W[:,t] = w[:,t] |> normalise
+    end
+
+    return Dict("w" => w, "W" => W, "X" => X)
+
+end
+
 function generic_particle_filtering_logweights(Mt, logGt, N, RS)
     times::Array{Float64, 1} = Mt |> keys |> collect |> sort
     # Initialisation
