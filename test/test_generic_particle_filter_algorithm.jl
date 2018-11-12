@@ -39,8 +39,12 @@ end;
     Random.seed!(0)
 # srand(0)
     pf = FeynmanKacParticleFilters.generic_particle_filtering(Mt, Gt, Nparts, RS)
+    W = pf["W"]
 
     @test typeof(pf) == Dict{String,Array{Float64,2}}
+    for i in 1:size(W,2)
+        @test pf["W"][1,i] ≈ [1.58397e-6, 0.000109003, 0.247537, 0.332939][i] atol = 10^(-6)
+    end
     marginal_lik_factors = FeynmanKacParticleFilters.marginal_likelihood_factors(pf)
     # println(marginal_lik_factors)
     res = [ 0.005063925135653128, 0.0013145849369714938, 0.014640244207811792, 0.0017270473953601316]
