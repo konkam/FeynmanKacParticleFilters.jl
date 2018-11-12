@@ -1,6 +1,7 @@
-authors = ["konkam <guillaume.konkamking.work@gmail.com>"]
 name = "FeynmanKacParticleFilters"
 uuid = "b43f8e06-e683-11e8-294f-8d3ef32cb08c"
+authors = ["konkam <guillaume.konkamking.work@gmail.com>"]
 version = "0.1.0"
 
 [deps]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
