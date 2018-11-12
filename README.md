@@ -3,9 +3,8 @@
 
 A package to perform particle filtering (and smoothing) written using the Feynman-Kac formalism.
 
-Useful stochastic differential equation models implemented:
+Implemented as an example:
 - [Cox-Ingersoll-Ross](https://en.wikipedia.org/wiki/Cox%E2%80%93Ingersoll%E2%80%93Ross_model)
-- Wright-Fisher
 
 Outputs:
 - Marginal likelihood
