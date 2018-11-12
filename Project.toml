@@ -4,4 +4,5 @@ authors = ["konkam <guillaume.konkamking.work@gmail.com>"]
 version = "0.1.0"
 
 [deps]
+ExactWrightFisher = "8c1589a6-e1d0-11e8-3509-29fca4fccf6a"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
