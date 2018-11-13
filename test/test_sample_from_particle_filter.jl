@@ -1,11 +1,4 @@
-using StatsFuns, Distributions
-
-@testset "Test ESS functions" begin
-    @test FeynmanKacParticleFilters.ESS(repeat([1], inner = 10)./10) ≈ 10 atol=10.0^(-7)
-    @test FeynmanKacParticleFilters.logESS(repeat([1], inner = 10)./10 |> v -> log.(v)) ≈ log(10) atol=10.0^(-7)
-end;
-
-@testset "test particle filter algorithm for CIR process" begin
+@testset "test sampling from the particle filter algorithm for CIR process" begin
 
     Random.seed!(0)
 
@@ -53,24 +46,40 @@ end;
         @test pf["w"][1,i] ≈ [8.021083116860762e-8, 1.4329312817343978e-6, 0.03624009164218452, 0.005750007892716746][i] atol = 10^(-10)
     end
 
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions1D(pf, 10, 2)) == 10
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions(pf_dict, 10, 2)) == 10
+
+    Random.seed!(0)
     pf_logweights = FeynmanKacParticleFilters.generic_particle_filtering_logweights1D(Mt, logGt, Nparts, RS)
+    Random.seed!(0)
     pf_logweights_dict = FeynmanKacParticleFilters.generic_particle_filtering_logweights(Mt, logGt, Nparts, RS)
 
     @test typeof(pf_logweights) == Dict{String,Array{Float64,2}}
     @test typeof(pf_logweights_dict) == Dict{String,Any}
 
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf_logweights, 10, 2)) == 10
+
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights(pf_logweights_dict, 10, 2)) == 10
+    #
+
+    Random.seed!(0)
     pf_adaptive = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling1D(Mt, Gt, Nparts, RS)
 
+    Random.seed!(0)
     pf_adaptive_dict = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling(Mt, Gt, Nparts, RS)
 
-    @test typeof(pf_adaptive) == Dict{String,Array}
-    @test typeof(pf_adaptive_dict) == Dict{String,Any}
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions1D(pf_adaptive, 10, 2)) == 10
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions(pf_adaptive_dict, 10, 2)) == 10
 
+
+    Random.seed!(0)
     pf_adaptive_logweights = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling_logweights1D(Mt, logGt, Nparts, RS)
 
-    pf_adaptive_logweights_dict = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, Nparts, RS)
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf_adaptive_logweights, 10, 2)) == 10
 
-    @test typeof(pf_adaptive_logweights) == Dict{String,Array}
-    @test typeof(pf_adaptive_logweights_dict) == Dict{String,Any}
+    Random.seed!(0)
+    pf_adaptive_logweights_dict = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, Nparts, RS)
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights(pf_adaptive_logweights_dict, 10, 2)) == 10
+
 
 end
