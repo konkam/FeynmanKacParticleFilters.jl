@@ -69,15 +69,16 @@ end;
     @test FeynmanKacParticleFilters.marginal_likelihood(pf_dict, FeynmanKacParticleFilters.marginal_likelihood_factors)  ≈ prod(res) atol=10.0^(-7)
 
     @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions1D(pf, 10, 2)) == 10
-    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_dict(pf_dict, 10, 2)) == 10
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions(pf_dict, 10, 2)) == 10
 
     Random.seed!(0)
     pf_logweights = FeynmanKacParticleFilters.generic_particle_filtering_logweights1D(Mt, logGt, Nparts, RS)
     Random.seed!(0)
-    pf_logweights_dict = FeynmanKacParticleFilters.generic_particle_filtering_logweights1D(Mt, logGt, Nparts, RS)
+    pf_logweights_dict = FeynmanKacParticleFilters.generic_particle_filtering_logweights(Mt, logGt, Nparts, RS)
 
     @test typeof(pf_logweights) == Dict{String,Array{Float64,2}}
-    @test typeof(pf_logweights_dict) == Dict{String,Array{Float64,2}}
+    @test typeof(pf_logweights_dict) == Dict{String,Any}
+
     marginal_loglik_factors = FeynmanKacParticleFilters.marginal_loglikelihood_factors(pf_logweights)
     # println(marginal_loglik_factors)
     res = [ -5.285613377888339, -6.634234300460378, -4.223981089726635, -6.361342036441921]
@@ -92,8 +93,9 @@ end;
 
     @test FeynmanKacParticleFilters.marginal_loglikelihood(pf_logweights, FeynmanKacParticleFilters.marginal_loglikelihood_factors) ≈ sum(res) atol=5*10.0^(-5)
     @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf_logweights, 10, 2)) == 10
+
     @test FeynmanKacParticleFilters.marginal_loglikelihood(pf_logweights_dict, FeynmanKacParticleFilters.marginal_loglikelihood_factors) ≈ sum(res) atol=5*10.0^(-5)
-    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf_logweights_dict, 10, 2)) == 10
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights(pf_logweights_dict, 10, 2)) == 10
     #
 
     Random.seed!(0)
