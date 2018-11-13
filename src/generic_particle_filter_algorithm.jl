@@ -13,9 +13,8 @@ function generic_particle_filtering1D(Mt, Gt, N, RS)
 
     #Filtering
     for t in 2:length(times)
-        time::Float64 = times[t]
         A::Array{Int64, 1} = RS(W[:,t-1])
-        X[:,t] = Mt[time](X[A,t-1])
+        X[:,t] = Mt[times[t]](X[A,t-1])
         w[:,t] =  Gt[times[t]].(X[:,t])
         W[:,t] = w[:,t] |> normalise
     end
@@ -38,10 +37,9 @@ function generic_particle_filtering(Mt, Gt, N, RS)
 
     #Filtering
     for t in 2:length(times)
-        time::Float64 = times[t]
         A::Array{Int64, 1} = RS(W[:,t-1])
-        X[t] = Mt[time](X[t-1][A])
-        w[:,t] =  Gt[time].(X[t])
+        X[t] = Mt[times[t]](X[t-1][A])
+        w[:,t] =  Gt[times[t]].(X[t])
         W[:,t] = w[:,t] |> normalise
     end
 
@@ -62,9 +60,8 @@ function generic_particle_filtering_logweights1D(Mt, logGt, N, RS)
 
     #Filtering
     for t in 2:length(times)
-        time::Float64 = times[t]
         A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
-        X[:,t] = Mt[time](X[A,t-1])
+        X[:,t] = Mt[times[t]](X[A,t-1])
         logw[:,t] = logGt[times[t]].(X[:,t])
         logW[:,t] = logw[:,t] .- StatsFuns.logsumexp(logw[:,t])
     end
@@ -86,9 +83,8 @@ function generic_particle_filtering_logweights(Mt, logGt, N, RS)
 
     #Filtering
     for t in 2:length(times)
-        time::Float64 = times[t]
         A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
-        X[t] = Mt[time](X[t-1][A])
+        X[t] = Mt[times[t]](X[t-1][A])
         logw[:,t] = logGt[times[t]].(X[t])
         logW[:,t] = logw[:,t] .- StatsFuns.logsumexp(logw[:,t])
     end
@@ -127,7 +123,6 @@ function generic_particle_filtering_adaptive_resampling1D(Mt, Gt, N, RS)
 
     #Filtering
     for t in 2:length(times)
-        time::Float64 = times[t]
         if ESS(W[:,t-1]) < ESSmin
             A::Array{Int64, 1} = RS(W[:,t-1])
             ŵ = 1
@@ -137,7 +132,7 @@ function generic_particle_filtering_adaptive_resampling1D(Mt, Gt, N, RS)
             ŵ = w[:,t-1]
             resampled[t] = false
         end
-        X[:,t] = Mt[time](X[A,t-1])
+        X[:,t] = Mt[times[t]](X[A,t-1])
         w[:,t] =  ŵ .* Gt[times[t]].(X[:,t])
         W[:,t] = w[:,t] |> normalise
     end
@@ -163,7 +158,6 @@ function generic_particle_filtering_adaptive_resampling(Mt, Gt, N, RS)
 
     #Filtering
     for t in 2:length(times)
-        time::Float64 = times[t]
         if ESS(W[:,t-1]) < ESSmin
             A::Array{Int64, 1} = RS(W[:,t-1])
             ŵ = 1
@@ -173,7 +167,7 @@ function generic_particle_filtering_adaptive_resampling(Mt, Gt, N, RS)
             ŵ = w[:,t-1]
             resampled[t] = false
         end
-        X[t] = Mt[time](X[t-1][A])
+        X[t] = Mt[times[t]](X[t-1][A])
         w[:,t] =  ŵ .* Gt[times[t]].(X[t])
         W[:,t] = w[:,t] |> normalise
     end
@@ -200,7 +194,6 @@ function generic_particle_filtering_adaptive_resampling_logweights1D(Mt, logGt, 
 
     #Filtering
     for t in 2:length(times)
-        time::Float64 = times[t]
         if logESS(logW[:,t-1]) < logESSmin
             A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
             logŵ .= 0.
@@ -210,11 +203,10 @@ function generic_particle_filtering_adaptive_resampling_logweights1D(Mt, logGt, 
             logŵ = logw[:,t-1]
             resampled[t] = false
         end
-        X[:,t] = Mt[time](X[A,t-1])
+        X[:,t] = Mt[times[t]](X[A,t-1])
         logw[:,t] =  logŵ .+ logGt[times[t]].(X[:,t])
         logW[:,t] = logw[:,t] .- StatsFuns.logsumexp(logw[:,t])
     end
-
     return Dict("logw" => logw, "logW" => logW, "X" => X, "resampled" => resampled)
 end
 
@@ -236,7 +228,6 @@ function generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, N,
 
     #Filtering
     for t in 2:length(times)
-        time::Float64 = times[t]
         if logESS(logW[:,t-1]) < logESSmin
             A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
             logŵ .= 0.
@@ -246,7 +237,7 @@ function generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, N,
             logŵ = logw[:,t-1]
             resampled[t] = false
         end
-        X[t] = Mt[time](X[t-1][A])
+        X[t] = Mt[times[t]](X[t-1][A])
         logw[:,t] =  logŵ .+ logGt[times[t]].(X[t])
         logW[:,t] = logw[:,t] .- StatsFuns.logsumexp(logw[:,t])
     end
