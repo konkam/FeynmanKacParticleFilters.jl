@@ -101,6 +101,9 @@ end;
     Random.seed!(0)
     pf_adaptive = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling1D(Mt, Gt, Nparts, RS)
 
+    Random.seed!(0)
+    pf_adaptive_dict = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling(Mt, Gt, Nparts, RS)
+
     marginal_lik_factors = FeynmanKacParticleFilters.marginal_likelihood_factors_adaptive_resampling(pf_adaptive)
     # println(marginal_lik_factors)
     res = [0.005063925135653128, 0.0013145849369714936, 0.014640244207811792, 0.0020015945094952942]
@@ -109,6 +112,16 @@ end;
     end
     @test FeynmanKacParticleFilters.marginal_likelihood(pf_adaptive, FeynmanKacParticleFilters.marginal_likelihood_factors) ≈ prod(res) atol=10.0^(-7)
     @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions1D(pf_adaptive, 10, 2)) == 10
+
+    marginal_lik_factors = FeynmanKacParticleFilters.marginal_likelihood_factors_adaptive_resampling(pf_adaptive_dict)
+    # println(marginal_lik_factors)
+    res = [0.005063925135653128, 0.0013145849369714936, 0.014640244207811792, 0.0020015945094952942]
+    for k in 1:Nsteps
+        @test marginal_lik_factors[k] ≈ res[k] atol=10.0^(-7)
+    end
+    @test FeynmanKacParticleFilters.marginal_likelihood(pf_adaptive_dict, FeynmanKacParticleFilters.marginal_likelihood_factors) ≈ prod(res) atol=10.0^(-7)
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions(pf_adaptive_dict, 10, 2)) == 10
+
 
     Random.seed!(0)
     pf_adaptive_logweights = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling_logweights1D(Mt, logGt, Nparts, RS)
@@ -120,5 +133,17 @@ end;
     end
     @test FeynmanKacParticleFilters.marginal_loglikelihood(pf_adaptive_logweights, FeynmanKacParticleFilters.marginal_loglikelihood_factors_adaptive_resampling) ≈ sum(res) atol=5*10.0^(-5)
     @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf_adaptive_logweights, 10, 2)) == 10
+
+    Random.seed!(0)
+    pf_adaptive_logweights_dict = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, Nparts, RS)
+    marginal_loglik_factors = FeynmanKacParticleFilters.marginal_loglikelihood_factors_adaptive_resampling(pf_adaptive_logweights_dict)
+    # println(marginal_loglik_factors)
+    res = [ -5.285613377888339, -6.634234300460378, -4.223981089726635, -6.213811161313297]
+    for k in 1:Nsteps
+        @test marginal_loglik_factors[k] ≈ res[k] atol=5*10.0^(-5)
+    end
+    @test FeynmanKacParticleFilters.marginal_loglikelihood(pf_adaptive_logweights_dict, FeynmanKacParticleFilters.marginal_loglikelihood_factors_adaptive_resampling) ≈ sum(res) atol=5*10.0^(-5)
+    @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights(pf_adaptive_logweights_dict, 10, 2)) == 10
+
 
 end
