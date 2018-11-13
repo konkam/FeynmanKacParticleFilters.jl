@@ -1,3 +1,7 @@
+[![Coverage Status](https://coveralls.io/repos/github/konkam/FeynmanKacParticleFilters.jl/badge.svg?branch=master)](https://coveralls.io/github/konkam/FeynmanKacParticleFilters.jl?branch=master)
+[![codecov](https://codecov.io/gh/konkam/FeynmanKacParticleFilters.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/konkam/FeynmanKacParticleFilters.jl)
+[![Build Status](https://travis-ci.org/konkam/FeynmanKacParticleFilters.jl.svg?branch=master)](https://travis-ci.org/konkam/FeynmanKacParticleFilters.jl)
+
 # FeynmanKacParticleFilters
 
 
@@ -51,7 +55,15 @@ The transition density of the 1-D CIR process is available as:
 
 <img src="Latex_equations/CIR_trans.gif" width="450">
 
-We start by simulating some data:
+from which it easy to simulate.
+Moreover, we consider a Poisson distribution as the emission density:
+
+<!-- f_t(y_t|x_t) = \frac{x_t^{y_t}}{y_t!}e^{-x_t} -->
+
+<img src="Latex_equations/poisson_dens.gif" width="150">
+
+
+We start by simulating some data (a function to simulate from the transition density is available in the package):
 
 ```julia
 using FeynmanKacParticleFilters, Distributions, Random
@@ -76,14 +88,22 @@ Y = map(λ -> rand(Poisson(λ), Nobs), X);
 data = zip(times, Y) |> Dict
 ```
 
-Now define the (log)potential function Gt and the transition kernel for the Cox-Ingersoll-Ross model:
+Now define the (log)potential function Gt,  the transition kernel for the Cox-Ingersoll-Ross model and a resampling scheme (here multinomial):
 
 ```julia
 Mt = FeynmanKacParticleFilters.create_transition_kernels_CIR(data, δ, γ, σ)
-Gt = FeynmanKacParticleFilters.create_potential_functions_CIR(data)
 logGt = FeynmanKacParticleFilters.create_log_potential_functions_CIR(data)
 RS(W) = rand(Categorical(W), length(W))
 ```
+
+Now running the boostrap filter algorithm
+
+
+```julia
+pf = FeynmanKacParticleFilters.generic_particle_filtering_logweights1D(Mt, logGt, Nparts, RS)
+```
+
+ # How to
 
 **References:**
 
