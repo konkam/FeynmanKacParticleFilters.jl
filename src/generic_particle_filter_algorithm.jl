@@ -7,13 +7,14 @@ function generic_particle_filtering1D(Mt, Gt, N, RS)
     w = Array{Float64, 2}(undef, N,length(times))
     W = Array{Float64, 2}(undef, N,length(times))
     A = Array{Int64, 1}(undef, N)
-    X[:,1] = rand(Mt[times[1]], N)
+    X[:,1] = Mt[times[1]].(1:N)
+
     w[:,1] =  Gt[times[1]].(X[:,1])
     W[:,1] = w[:,1] |> normalise
 
     #Filtering
     for t in 2:length(times)
-        A::Array{Int64, 1} = RS(W[:,t-1])
+                A::Array{Int64, 1} = RS(W[:,t-1])
         X[:,t] = Mt[times[t]](X[A,t-1])
         w[:,t] =  Gt[times[t]].(X[:,t])
         W[:,t] = w[:,t] |> normalise
@@ -31,8 +32,9 @@ function generic_particle_filtering(Mt, Gt, N, RS)
     w = Array{Float64, 2}(undef, N,length(times))
     W = Array{Float64, 2}(undef, N,length(times))
     A = Array{Int64, 1}(undef, N)
-    X[1] = rand(Mt[times[1]], N)
-    w[:,1] =  Gt[times[1]].(X[1])
+    X[1] = Mt[times[1]].(1:N)
+
+    w[:,1] =  Gt[times[1]](X[1])
     W[:,1] = w[:,1] |> normalise
 
     #Filtering
@@ -54,7 +56,8 @@ function generic_particle_filtering_logweights1D(Mt, logGt, N, RS)
     logw = Array{Float64, 2}(undef, N,length(times))
     logW = Array{Float64, 2}(undef, N,length(times))
     A = Array{Int64, 1}(undef, N)
-    X[:,1] = rand(Mt[times[1]], N)
+    X[:,1] = Mt[times[1]].(1:N)
+
     logw[:,1] =  logGt[times[1]].(X[:,1])
     logW[:,1] = logw[:,1] .- StatsFuns.logsumexp(logw[:,1])
 
@@ -77,13 +80,14 @@ function generic_particle_filtering_logweights(Mt, logGt, N, RS)
     logw = Array{Float64, 2}(undef, N,length(times))
     logW = Array{Float64, 2}(undef, N,length(times))
     A = Array{Int64, 1}(undef, N)
-    X[1] = rand(Mt[times[1]], N)
-    logw[:,1] =  logGt[times[1]].(X[1])
+    X[1] = Mt[times[1]].(1:N)
+
+    logw[:,1] =  logGt[times[1]](X[1])
     logW[:,1] = logw[:,1] .- StatsFuns.logsumexp(logw[:,1])
 
     #Filtering
     for t in 2:length(times)
-        A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
+                A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
         X[t] = Mt[times[t]](X[t-1][A])
         logw[:,t] = logGt[times[t]].(X[t])
         logW[:,t] = logw[:,t] .- StatsFuns.logsumexp(logw[:,t])
@@ -116,14 +120,15 @@ function generic_particle_filtering_adaptive_resampling1D(Mt, Gt, N, RS)
     ŵ = Array{Int64, 1}(undef, N)
     resampled = Array{Bool, 1}(undef, length(times))
 
-    X[:,1] = rand(Mt[times[1]], N)
+    X[:,1] = Mt[times[1]].(1:N)
+
     w[:,1] =  Gt[times[1]].(X[:,1])
     W[:,1] = w[:,1] |> normalise
     resampled[1] = true #this is intended to make the likelihood computations work
 
     #Filtering
     for t in 2:length(times)
-        if ESS(W[:,t-1]) < ESSmin
+                if ESS(W[:,t-1]) < ESSmin
             A::Array{Int64, 1} = RS(W[:,t-1])
             ŵ = 1
             resampled[t] = true
@@ -151,14 +156,15 @@ function generic_particle_filtering_adaptive_resampling(Mt, Gt, N, RS)
     ŵ = Array{Int64, 1}(undef, N)
     resampled = Array{Bool, 1}(undef, length(times))
 
-    X[1] = rand(Mt[times[1]], N)
-    w[:,1] =  Gt[times[1]].(X[1])
+    X[1] = Mt[times[1]].(1:N)
+
+    w[:,1] =  Gt[times[1]](X[1])
     W[:,1] = w[:,1] |> normalise
     resampled[1] = true #this is intended to make the likelihood computations work
 
     #Filtering
     for t in 2:length(times)
-        if ESS(W[:,t-1]) < ESSmin
+                if ESS(W[:,t-1]) < ESSmin
             A::Array{Int64, 1} = RS(W[:,t-1])
             ŵ = 1
             resampled[t] = true
@@ -187,14 +193,15 @@ function generic_particle_filtering_adaptive_resampling_logweights1D(Mt, logGt, 
     logŵ = Array{Float64, 1}(undef, N)
     resampled = Array{Bool, 1}(undef, length(times))
 
-    X[:,1] = rand(Mt[times[1]], N)
+    X[:,1] = Mt[times[1]].(1:N)
+
     logw[:,1] =  logGt[times[1]].(X[:,1])
     logW[:,1] = logw[:,1] .- StatsFuns.logsumexp(logw[:,1])
     resampled[1] = true #this is intended to make the likelihood computations work
 
     #Filtering
     for t in 2:length(times)
-        if logESS(logW[:,t-1]) < logESSmin
+                if logESS(logW[:,t-1]) < logESSmin
             A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
             logŵ .= 0.
             resampled[t] = true
@@ -207,6 +214,7 @@ function generic_particle_filtering_adaptive_resampling_logweights1D(Mt, logGt, 
         logw[:,t] =  logŵ .+ logGt[times[t]].(X[:,t])
         logW[:,t] = logw[:,t] .- StatsFuns.logsumexp(logw[:,t])
     end
+
     return Dict("logw" => logw, "logW" => logW, "X" => X, "resampled" => resampled)
 end
 
@@ -221,14 +229,14 @@ function generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, N,
     logŵ = Array{Float64, 1}(undef, N)
     resampled = Array{Bool, 1}(undef, length(times))
 
-    X[1] = rand(Mt[times[1]], N)
-    logw[:,1] =  logGt[times[1]].(X[1])
+    X[1] = Mt[times[1]].(1:N)
+    logw[:,1] =  logGt[times[1]](X[1])
     logW[:,1] = logw[:,1] .- StatsFuns.logsumexp(logw[:,1])
     resampled[1] = true #this is intended to make the likelihood computations work
 
     #Filtering
     for t in 2:length(times)
-        if logESS(logW[:,t-1]) < logESSmin
+                if logESS(logW[:,t-1]) < logESSmin
             A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
             logŵ .= 0.
             resampled[t] = true
@@ -249,9 +257,4 @@ end
 function create_potential_functions(data, potential)
     times = data |> keys |> collect |> sort
     return zip(times, [potential(data[t]) for t in times]) |> Dict
-end
-
-function create_transition_kernels(data, transition_kernel, prior)
-    times = data |> keys |> collect |> sort
-    return zip(times, [prior; [transition_kernel(times[k]-times[k-1]) for k in 2:length(times)]]) |> Dict
 end
