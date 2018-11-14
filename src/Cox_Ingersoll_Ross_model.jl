@@ -20,7 +20,7 @@ function create_transition_kernels_CIR(data, δ, γ, σ)
         return Mt
     end
     prior = Gamma(δ/2, σ^2/γ)#parameterisation shape scale
-    create_transition_kernels(data, create_Mt, prior)
+    return create_transition_kernels(data, create_Mt, prior)
 end
 
 function create_potential_functions_CIR(data)
