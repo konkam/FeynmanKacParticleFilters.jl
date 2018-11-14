@@ -252,9 +252,3 @@ function generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, N,
 
     return Dict("logw" => logw, "logW" => logW, "X" => X, "resampled" => resampled)
 end
-
-
-function create_potential_functions(data, potential)
-    times = data |> keys |> collect |> sort
-    return zip(times, [potential(data[t]) for t in times]) |> Dict
-end
