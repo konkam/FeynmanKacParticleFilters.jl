@@ -34,13 +34,13 @@ function generic_particle_filtering(Mt, Gt, N, RS)
     A = Array{Int64, 1}(undef, N)
     X[1] = Mt[times[1]].(1:N)
 
-    w[:,1] =  Gt[times[1]](X[1])
+    w[:,1] =  Gt[times[1]].(X[1])
     W[:,1] = w[:,1] |> normalise
 
     #Filtering
     for t in 2:length(times)
         A::Array{Int64, 1} = RS(W[:,t-1])
-        X[t] = Mt[times[t]](X[t-1][A])
+        X[t] = Mt[times[t]].(X[t-1][A])
         w[:,t] =  Gt[times[t]].(X[t])
         W[:,t] = w[:,t] |> normalise
     end
@@ -82,13 +82,13 @@ function generic_particle_filtering_logweights(Mt, logGt, N, RS)
     A = Array{Int64, 1}(undef, N)
     X[1] = Mt[times[1]].(1:N)
 
-    logw[:,1] =  logGt[times[1]](X[1])
+    logw[:,1] =  logGt[times[1]].(X[1])
     logW[:,1] = logw[:,1] .- StatsFuns.logsumexp(logw[:,1])
 
     #Filtering
     for t in 2:length(times)
                 A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
-        X[t] = Mt[times[t]](X[t-1][A])
+        X[t] = Mt[times[t]].(X[t-1][A])
         logw[:,t] = logGt[times[t]].(X[t])
         logW[:,t] = logw[:,t] .- StatsFuns.logsumexp(logw[:,t])
     end
@@ -158,7 +158,7 @@ function generic_particle_filtering_adaptive_resampling(Mt, Gt, N, RS)
 
     X[1] = Mt[times[1]].(1:N)
 
-    w[:,1] =  Gt[times[1]](X[1])
+    w[:,1] =  Gt[times[1]].(X[1])
     W[:,1] = w[:,1] |> normalise
     resampled[1] = true #this is intended to make the likelihood computations work
 
@@ -173,7 +173,7 @@ function generic_particle_filtering_adaptive_resampling(Mt, Gt, N, RS)
             ŵ = w[:,t-1]
             resampled[t] = false
         end
-        X[t] = Mt[times[t]](X[t-1][A])
+        X[t] = Mt[times[t]].(X[t-1][A])
         w[:,t] =  ŵ .* Gt[times[t]].(X[t])
         W[:,t] = w[:,t] |> normalise
     end
@@ -230,7 +230,7 @@ function generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, N,
     resampled = Array{Bool, 1}(undef, length(times))
 
     X[1] = Mt[times[1]].(1:N)
-    logw[:,1] =  logGt[times[1]](X[1])
+    logw[:,1] =  logGt[times[1]].(X[1])
     logW[:,1] = logw[:,1] .- StatsFuns.logsumexp(logw[:,1])
     resampled[1] = true #this is intended to make the likelihood computations work
 
@@ -245,7 +245,7 @@ function generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, N,
             logŵ = logw[:,t-1]
             resampled[t] = false
         end
-        X[t] = Mt[times[t]](X[t-1][A])
+        X[t] = Mt[times[t]].(X[t-1][A])
         logw[:,t] =  logŵ .+ logGt[times[t]].(X[t])
         logW[:,t] = logw[:,t] .- StatsFuns.logsumexp(logw[:,t])
     end
