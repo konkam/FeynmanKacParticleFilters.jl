@@ -33,7 +33,7 @@ end
 
 data_WF3[time_grid_WF3[2]]
 
-logGt = FeynmanKacParticleFilters.create_potential_functions(data_WF3, multinomial_potential)
+logGt = FeynmanKacParticleFilters.create_potential_functions(data_WF3, multinomial_logpotential)
 Mt = create_transition_kernels_WF(data_WF3, α_vec)
 RS(W) = rand(Categorical(W), length(W))
 
