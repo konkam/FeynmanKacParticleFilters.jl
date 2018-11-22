@@ -9,6 +9,7 @@ A package to perform particle filtering (and smoothing) written using the Feynma
 
 Implemented as an example:
 - [Cox-Ingersoll-Ross](https://en.wikipedia.org/wiki/Cox%E2%80%93Ingersoll%E2%80%93Ross_model) (CIR)
+- K dimensional Wright Fisher model
 
 Outputs:
 - Marginal likelihood
@@ -86,6 +87,12 @@ times = [k*Δt for k in 0:(Nsteps-1)]
 X = FeynmanKacParticleFilters.generate_CIR_trajectory(time_grid, 3, δ*1.2, γ/1.2, σ*0.7)
 Y = map(λ -> rand(Poisson(λ), Nobs), X);
 data = zip(times, Y) |> Dict
+
+4-element Array{Float64,1}:
+ 0.0
+ 0.1
+ 0.2
+ 0.30000000000000004
 ```
 
 Now define the (log)potential function Gt,  the transition kernel for the Cox-Ingersoll-Ross model and a resampling scheme (here multinomial):
@@ -101,6 +108,21 @@ Now running the boostrap filter algorithm
 
 ```julia
 pf = FeynmanKacParticleFilters.generic_particle_filtering_logweights1D(Mt, logGt, Nparts, RS)
+```
+
+To sample nsample values from the i-th filtering distributions, do:
+
+```julia
+n_samples = 100
+i = 4
+FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf, n_samples, i)
+100-element Array{Float64,1}:
+ 3.3924167451813956
+ 3.3924167451813956
+ 5.371960182098351
+ 3.3924167451813956
+ 6.181638161092906
+ ⋮
 ```
 
  # How to
