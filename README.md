@@ -27,7 +27,7 @@ The input of a generic particle filter are:
   - G_t is a potential function which can be evaluated for all values of t  
   - It is possible to simulate from M_0(dx0) and M_t(x_t-1, dxt)  
 - The number of particles N  
-- The choice of an unbiased resampling scheme (e.g. multinomial), i.e. an algorithm to draw variables <img src="Latex_equations/rs.gif" width="90"> in 1:N where RS is a distribution such that: <img src="Latex_equations/expect.gif" width="90">.
+- The choice of an unbiased resampling scheme (e.g. multinomial), i.e. an algorithm to draw variables <img src="Latex_equations/rs.gif" width="90"> in 1:N where RS is a distribution such that: <img src="Latex_equations/expect.gif" width="120">.
 
 For adaptive resampling, one needs in addition:
 - a scalar <img src="Latex_equations/ess.gif" width="90">
