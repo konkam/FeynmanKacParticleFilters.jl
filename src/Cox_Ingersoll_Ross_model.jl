@@ -8,7 +8,7 @@ function rCIR(n::Integer, Dt::Real, x0::Real, δ, γ, σ)
     else
         ks = rand(Poisson(γ/σ^2*x0/(exp(2*γ*Dt)-1)), n)
         return rand.(Gamma.(ks .+ δ/2, 1/β))
-    end
+    end 
 end
 
 function create_transition_kernels_CIR(data, δ, γ, σ)
