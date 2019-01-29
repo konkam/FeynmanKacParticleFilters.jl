@@ -14,7 +14,7 @@ function generic_particle_filtering1D(Mt, Gt, N, RS)
 
     #Filtering
     for t in 2:length(times)
-                A::Array{Int64, 1} = RS(W[:,t-1])
+        A::Array{Int64, 1} = RS(W[:,t-1])
         X[:,t] = Mt[times[t]](X[A,t-1])
         w[:,t] =  Gt[times[t]].(X[:,t])
         W[:,t] = w[:,t] |> normalise
