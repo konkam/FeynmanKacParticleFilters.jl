@@ -9,4 +9,5 @@ include("Cox_Ingersoll_Ross_model.jl")
 include("common_utility_functions.jl")
 include("create_transition_kernels.jl")
 include("create_potential_functions.jl")
+include("two_filter_smoothing_algorithm.jl")
 end # module
