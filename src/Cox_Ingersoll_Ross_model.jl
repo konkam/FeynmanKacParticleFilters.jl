@@ -55,7 +55,12 @@ end
 
 # Iacus, Stefano M. Simulation and inference for stochastic differential equations: with R examples. Springer Science & Business Media, 2009. p.47
 function CIR_transition_density_param_iacus_cuvq(c::Real, u::Real, v::Real, q::Real)
-    return c * exp(-(u+v)) * (u/v)^(q/2) * besseli(q, 2*sqrt(u*v))
+    # return c * exp(-(u+v)) * (u/v)^(q/2) * besseli(q, 2*sqrt(u*v))
+    return exp(CIR_transition_logdensity_param_iacus_cuvq(c, u, v, q))
+end
+
+function CIR_transition_logdensity_param_iacus_cuvq(c::Real, u::Real, v::Real, q::Real)
+    return log(c) -(u+v) + q/2 * log(v/u) + log(besseli(q, 2*sqrt(u*v)))
 end
 
 function u_iacus(c::Real, x0::Real, θ2::Real, t::Real)
