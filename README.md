@@ -14,9 +14,15 @@ Implemented as an example:
 Outputs:
 - Marginal likelihood
 - Samples from the filtering distribution
+- Samples from the marginal smoothing distribution
 
 Implemented:
-- Bootstrap particle filter with adaptive resampling.
+- Bootstrap particle filter with adaptive resampling.  
+- Two filters particle smoother
+
+Potentially useful functions:
+- Evaluation of the transition density for the Cox-Ingersoll-Ross process
+- Random trajectory generation from the Cox-Ingersoll-Ross process
 
 # Preliminary notions
 
