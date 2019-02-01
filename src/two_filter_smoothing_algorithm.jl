@@ -34,7 +34,9 @@ function two_filter_smoothing_algorithm1D(Mt, Gt, N, RS, transition_density::Fun
         w_mn[t] = Array{Float64, 2}(undef, M, N)
         for n in 1:N
             for m in 1:M
-                w_mn[t][m, n] = particle_filter["W"][n,k] * information_filter["W"][m,k+1] * transition_density(Xtp1[t][k], Xt[t][k], Δtp1) / γ(Xtp1[t][k])
+                # w_mn[t][m, n] = particle_filter["W"][n,k] * information_filter["W"][m,k+1] * transition_density(Xtp1[t][k], Xt[t][k], Δtp1) / γ(Xtp1[t][k])
+                logw = log(particle_filter["W"][n,k]) + log(information_filter["W"][m,k+1]) + log(transition_density(Xtp1[t][k], Xt[t][k], Δtp1)) - log(γ(Xtp1[t][k]))
+                w_mn[t][m, n] = exp(logw)
             end
         end
         W_mn[t] = normalise(w_mn[t])
@@ -85,4 +87,18 @@ function two_filter_marginal_smoothing_algorithm1D(Mt, Gt, N, RS, transition_den
     W = Dict(zip(times_except_last, (sum(two_filter_smoother["W_mn"][t]; dims = 1) |> vec for t in times_except_last)))
 
     return Dict("Xt" => two_filter_smoother["Xt"], "W" =>  W)
+end
+
+function two_filter_marginal_smoothing_algorithm_logweights(Mt, logGt, N, RS, transition_logdensity::Function, logγ::Function)
+    two_filter_smoother = two_filter_smoothing_algorithm_logweights(Mt, logGt, N, RS, transition_logdensity, logγ)
+
+    times_except_last = keys(Mt) |> collect |> sort |> x -> x[1:(end-1)]
+    #
+    # println(times)
+    # println(two_filter_smoother["W_mn"] |> keys)
+
+    #Marginal weights are the sum over the Xt+1, i.e. sum of the weights along m, the first dimension
+    logW = Dict(zip(times_except_last, ([logsumexp(two_filter_smoother["logW_mn"][t][:,n]) for n in 1:N] for t in times_except_last)))
+
+    return Dict("Xt" => two_filter_smoother["Xt"], "logW" =>  logW)
 end

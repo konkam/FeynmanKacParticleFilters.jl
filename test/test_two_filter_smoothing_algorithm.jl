@@ -30,12 +30,34 @@ using StatsFuns, Distributions
     transition_density_CIR(Xtp1, Xt, Δtp1) = FeynmanKacParticleFilters.CIR_transition_density(Xtp1, Xt, Δtp1, δ, γ, σ)
     CIR_invariant_density(X) = FeynmanKacParticleFilters.CIR_invariant_density(X, δ, γ, σ)
 
-    @test_nowarn FeynmanKacParticleFilters.two_filter_smoothing_algorithm1D(Mt, Gt, 100, RS, transition_density_CIR, CIR_invariant_density)
+    transition_logdensity_CIR(Xtp1, Xt, Δtp1) = FeynmanKacParticleFilters.CIR_transition_logdensity(Xtp1, Xt, Δtp1, δ, γ, σ)
+    CIR_invariant_logdensity(X) = FeynmanKacParticleFilters.CIR_invariant_logdensity(X, δ, γ, σ)
 
-    @test_nowarn FeynmanKacParticleFilters.two_filter_smoothing_algorithm_logweights(Mt, logGt, 100, RS, transition_density_CIR, CIR_invariant_density)
+    Random.seed!(0)
+    res = FeynmanKacParticleFilters.two_filter_smoothing_algorithm1D(Mt, Gt, 100, RS, transition_density_CIR, CIR_invariant_density)
 
+    Random.seed!(0)
+    logres = FeynmanKacParticleFilters.two_filter_smoothing_algorithm_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
 
-    @test_nowarn FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm1D(Mt, Gt, 100, RS, transition_density_CIR, CIR_invariant_density)
+    for k in keys(logres["logW_mn"])
+        for l in eachindex(logres["logW_mn"][k])
+            @test exp(logres["logW_mn"][k][l]) ≈ res["W_mn"][k][l]
+        end
+    end
+
+    Random.seed!(0)
+
+    res =  FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm1D(Mt, Gt, 100, RS, transition_density_CIR, CIR_invariant_density)
+
+    Random.seed!(0)
+
+    logres =  FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
+
+    for k in keys(logres["logW"])
+        for l in eachindex(logres["logW"][k])
+            @test exp(logres["logW"][k][l]) ≈ res["W"][k][l]
+        end
+    end
 
     # W = pf["W"]
     # w = pf["w"]
