@@ -32,6 +32,11 @@ using StatsFuns, Distributions
 
     @test_nowarn FeynmanKacParticleFilters.two_filter_smoothing_algorithm1D(Mt, Gt, 100, RS, transition_density_CIR, CIR_invariant_density)
 
+    @test_nowarn FeynmanKacParticleFilters.two_filter_smoothing_algorithm_logweights(Mt, logGt, 100, RS, transition_density_CIR, CIR_invariant_density)
+
+
+    @test_nowarn FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm1D(Mt, Gt, 100, RS, transition_density_CIR, CIR_invariant_density)
+
     # W = pf["W"]
     # w = pf["w"]
     #
