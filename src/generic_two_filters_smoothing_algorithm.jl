@@ -111,7 +111,7 @@ function two_filter_marginal_smoothing_algorithm1D(Mt, Gt, N, RS, transition_den
 
     #Marginal weights are the sum over the Xt+1, i.e. sum of the weights along m, the first dimension
     # W = Dict(zip(1:(ntimes-1), (sum(two_filter_smoother["W_mn"][k]; dims = 1) |> vec for k in 1:(ntimes-1))))
-    W = map(k -> sum(two_filter_smoother["W_mn"][k], dims = 1), 1:(ntimes-1)) |>
+    W = map(k -> vec(sum(two_filter_smoother["W_mn"][k], dims = 1)), 1:(ntimes-1)) |>
           x -> hcat(x...)
 
     return Dict("X" => two_filter_smoother["Xt"], "W" =>  W)
@@ -123,7 +123,7 @@ function two_filter_marginal_smoothing_algorithm_logweights(Mt, logGt, N, RS, tr
     ntimes = length(Mt |> keys)
 
     #Marginal weights are the sum over the Xt+1, i.e. sum of the weights along m, the first dimension
-    logW = map(k -> mapslices(logsumexp, two_filter_smoother["logW_mn"][k], dims = 1), 1:(ntimes-1)) |>
+    logW = map(k -> vec(mapslices(logsumexp, two_filter_smoother["logW_mn"][k], dims = 1)), 1:(ntimes-1)) |>
       x -> hcat(x...)
 
     return Dict("X" => two_filter_smoother["Xt"], "logW" =>  logW)
@@ -136,7 +136,7 @@ function two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(
 
     #Marginal weights are the sum over the Xt+1, i.e. sum of the weights along m, the first dimension
     # logW = Dict(zip(1:(ntimes-1), ([logsumexp(two_filter_smoother["logW_mn"][k][:,n]) for n in 1:N] for k in 1:(ntimes-1))))
-    logW = map(k -> mapslices(logsumexp, two_filter_smoother["logW_mn"][k], dims = 1), 1:(ntimes-1)) |>
+    logW = map(k -> vec(mapslices(logsumexp, two_filter_smoother["logW_mn"][k], dims = 1)), 1:(ntimes-1)) |>
         x -> hcat(x...)
 
     return Dict("X" => two_filter_smoother["Xt"], "logW" =>  logW)
