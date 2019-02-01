@@ -83,6 +83,18 @@ function CIR_transition_density_param_iacus(x::Real, x0::Real, t::Real, θ1::Rea
     return CIR_transition_density_param_iacus_cuvq(c, u, v, q)
 end
 
+function CIR_transition_logdensity_param_iacus(x::Real, x0::Real, t::Real, θ1::Real, θ2::Real, θ3::Real)
+    c = c_iacus(θ2, θ3, t)
+    u = u_iacus(c, x0, θ2, t)
+    v = v_iacus(c, x)
+    q = q_iacus(θ1, θ3)
+    return CIR_transition_logdensity_param_iacus_cuvq(c, u, v, q)
+end
+
 CIR_transition_density(x::Real, x0::Real, t::Real, δ::Real, γ::Real, σ::Real) = CIR_transition_density_param_iacus(x::Real, x0::Real, t::Real, δ*σ^2, 2*γ, 2*σ)
 
+CIR_transition_logdensity(x::Real, x0::Real, t::Real, δ::Real, γ::Real, σ::Real) = CIR_transition_logdensity_param_iacus(x::Real, x0::Real, t::Real, δ*σ^2, 2*γ, 2*σ)
+
 CIR_invariant_density(x::Real, δ::Real, γ::Real, σ::Real) = pdf(Gamma(δ/2, γ/σ^2), x)
+
+CIR_invariant_logdensity(x::Real, δ::Real, γ::Real, σ::Real) = logpdf(Gamma(δ/2, γ/σ^2), x)
