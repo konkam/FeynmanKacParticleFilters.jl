@@ -4,7 +4,7 @@
 
 "Normalises a vector"
 function normalise(x)
-    return x/sum(x)
+    return x ./ sum(x)
 end
 
 function reverse_time_in_dict(dict)
