@@ -125,12 +125,12 @@ n_samples = 100
 i = 4
 FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf, n_samples, i)
 100-element Array{Float64,1}:
- 3.3924167451813956
- 3.3924167451813956
- 5.371960182098351
- 3.3924167451813956
- 6.181638161092906
- ⋮
+  5.371960182098351
+  5.371960182098351
+  3.3924167451813956
+  3.3924167451813956
+  3.3924167451813956
+  ⋮
 ```
 
  ## Smoothing
@@ -145,10 +145,20 @@ FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf, n
  transition_logdensity_CIR(Xtp1, Xt, Δtp1) = FeynmanKacParticleFilters.CIR_transition_logdensity(Xtp1, Xt, Δtp1, δ, γ, σ)
  ```
 
-With these two additional ingredients, we can obtain the two-filter smoother for the CIR process:
+With these two additional ingredients, we can obtain the two-filter smoother for the CIR process and sample from it:
 
 ```julia
-FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
+pf = FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
+n_samples = 100
+i = 4
+FeynmanKacParticleFilters.sample_from_smoothing_distributions_logweights(pf, n_samples, i)
+100-element Array{Float64,1}:
+ 3.3924167451813956
+ 3.3924167451813956
+ 5.371960182098351
+ 3.3924167451813956
+ 6.181638161092906
+ ⋮
 ```
 
 **References:**
