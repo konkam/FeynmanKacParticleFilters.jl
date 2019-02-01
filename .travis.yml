@@ -4,8 +4,8 @@ os:
 julia:
   - 1.0
   - 1.1
-codecov: true
-coveralls: true
+# codecov: true
+# coveralls: true
 
 ## uncomment the following lines to override the default test script
 # script:
