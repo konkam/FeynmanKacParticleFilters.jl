@@ -22,3 +22,9 @@ function create_transition_kernels(data, transition_kernel, prior)
     prior_rng(x) = rand(prior)
     return zip(times, [prior_rng; [transition_kernel(times[k]-times[k-1]) for k in 2:length(times)]]) |> Dict
 end
+
+function create_backward_transition_kernels(data, transition_kernel, prior)
+    times = data |> keys |> collect |> sort
+    prior_rng(x) = rand(prior)
+    return zip(times, [[transition_kernel(times[k+1]-times[k]) for k in 1:(length(times)-1)]; prior_rng]) |> Dict
+end
