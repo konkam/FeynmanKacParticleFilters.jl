@@ -84,3 +84,5 @@ function CIR_transition_density_param_iacus(x::Real, x0::Real, t::Real, θ1::Rea
 end
 
 CIR_transition_density(x::Real, x0::Real, t::Real, δ::Real, γ::Real, σ::Real) = CIR_transition_density_param_iacus(x::Real, x0::Real, t::Real, δ*σ^2, 2*γ, 2*σ)
+
+CIR_invariant_density(x::Real, δ::Real, γ::Real, σ::Real) = pdf(Gamma(δ/2, γ/σ^2), x)
