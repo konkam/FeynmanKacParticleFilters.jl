@@ -18,7 +18,7 @@ Outputs:
 
 Implemented:
 - Bootstrap particle filter with adaptive resampling.  
-- Two filters particle smoother
+- Two-filter particle smoother
 
 Potentially useful functions:
 - Evaluation of the transition density for the Cox-Ingersoll-Ross process
@@ -101,7 +101,9 @@ data = zip(times, Y) |> Dict
  0.30000000000000004
 ```
 
-Now define the (log)potential function Gt,  the transition kernel for the Cox-Ingersoll-Ross model and a resampling scheme (here multinomial):
+## Filtering
+
+Now we define the (log)potential function Gt,  a simulator from the transition kernel for the Cox-Ingersoll-Ross model and a resampling scheme (here multinomial):
 
 ```julia
 Mt = FeynmanKacParticleFilters.create_transition_kernels_CIR(data, δ, γ, σ)
@@ -109,14 +111,14 @@ logGt = FeynmanKacParticleFilters.create_log_potential_functions_CIR(data)
 RS(W) = rand(Categorical(W), length(W))
 ```
 
-Now running the boostrap filter algorithm
+Running the boostrap filter algorithm is performed as follows:
 
 
 ```julia
 pf = FeynmanKacParticleFilters.generic_particle_filtering_logweights1D(Mt, logGt, Nparts, RS)
 ```
 
-To sample nsample values from the i-th filtering distributions, do:
+To sample `nsample` values from the i-th filtering distributions, do:
 
 ```julia
 n_samples = 100
@@ -131,11 +133,28 @@ FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf, n
  ⋮
 ```
 
- # How to
+ ## Smoothing
+
+ To perform a simple particle smoothing on the CIR process using the two-filter algorithm, we additionally need:
+ - a sequence of distributions $\gamma_t$ for t=0:T, such that the Radon-Nikodym derivative \ganna_T/M_0 exists and may be computed pointwise   (we take the prior distribution on the last state for the information filter to be the prior distribution on the first state in the particle filter). Briers et al. (2010) suggest that the invariant density of the CIR process may be used for all distributions in the sequence.
+ - a function which evaluates the transition density of the CIR process.
+
+ ```julia
+ CIR_invariant_logdensity(X) = FeynmanKacParticleFilters.CIR_invariant_logdensity(X, δ, γ, σ)
+
+ transition_logdensity_CIR(Xtp1, Xt, Δtp1) = FeynmanKacParticleFilters.CIR_transition_logdensity(Xtp1, Xt, Δtp1, δ, γ, σ)
+ ```
+
+With these two additional ingredients, we can obtain the two-filter smoother for the CIR process:
+
+```julia
+FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
+```
 
 **References:**
 
 - Chopin, N. & Papaspiliopoulos, O. *A concise introduction to Sequential Monte Carlo*, to appear.
 - Del Moral, P. (2004). *Feynman-Kac formulae. Genealogical and interacting particle
 systems with applications.* Probability and its Applications. Springer Verlag, New
-York.
+York.  
+- Briers, M., Doucet, A. and Maskell, S. *Smoothing algorithms for state–space models.* Annals of the Institute of Statistical Mathematics 62.1 (2010): 61.
