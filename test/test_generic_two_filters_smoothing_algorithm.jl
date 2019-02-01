@@ -24,8 +24,12 @@ using StatsFuns, Distributions
     logGt = FeynmanKacParticleFilters.create_log_potential_functions_CIR(data)
     RS(W) = rand(Categorical(W), length(W))
 
-    Random.seed!(0)
     @test_nowarn FeynmanKacParticleFilters.generic_particle_information_filter1D(Mt, Gt, Nparts, RS)
+
+    @test_nowarn FeynmanKacParticleFilters.generic_particle_information_filter_logweights(Mt, logGt, Nparts, RS)
+
+    @test_nowarn FeynmanKacParticleFilters.generic_particle_information_filter_adaptive_resampling_logweights(Mt, logGt, Nparts, RS)
+
 
     transition_density_CIR(Xtp1, Xt, Δtp1) = FeynmanKacParticleFilters.CIR_transition_density(Xtp1, Xt, Δtp1, δ, γ, σ)
     CIR_invariant_density(X) = FeynmanKacParticleFilters.CIR_invariant_density(X, δ, γ, σ)
@@ -45,6 +49,8 @@ using StatsFuns, Distributions
         end
     end
 
+    @test_nowarn FeynmanKacParticleFilters.two_filter_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
+
     Random.seed!(0)
 
     res =  FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm1D(Mt, Gt, 100, RS, transition_density_CIR, CIR_invariant_density)
@@ -59,7 +65,7 @@ using StatsFuns, Distributions
         end
     end
 
-
+    @test_nowarn  FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
 
 end
 

@@ -12,6 +12,14 @@ function generic_particle_information_filter_logweights(Mt, logGt, N, RS)
 
 end
 
+function generic_particle_information_filter_adaptive_resampling_logweights(Mt, logGt, N, RS)
+
+    res =  generic_particle_filtering_adaptive_resampling_logweights(reverse_time_in_dict_except_first(Mt), reverse_time_in_dict(logGt), N, RS)
+    return Dict("logw" => res["logw"][:,end:-1:1], "logW" => res["logW"][:,end:-1:1], "X" => reverse_time_in_dict(res["X"]))
+
+end
+
+
 function two_filter_smoothing_algorithm1D(Mt, Gt, N, RS, transition_density::Function, γ::Function)
     #For simplicity, γ is the invariant density of the process
     #transition_density(Xt+1, Xt, Δtp1) is the transition density of Xt+1 given Xt
@@ -45,17 +53,14 @@ function two_filter_smoothing_algorithm1D(Mt, Gt, N, RS, transition_density::Fun
 end
 
 
-function two_filter_smoothing_algorithm_logweights(Mt, logGt, N, RS, transition_logdensity::Function, logγ::Function)
+function common_part_two_filter_smoother_with_or_without_resampling(transition_logdensity::Function, logγ::Function, times, particle_filter, information_filter)
     #For simplicity, logγ is the invariant logdensity of the process
     #transition_logdensity(Xt+1, Xt, Δtp1) is the transition logdensity of Xt+1 given Xt
-    particle_filter = generic_particle_filtering_logweights(Mt, logGt, N, RS)
-    information_filter = generic_particle_information_filter_logweights(Mt, logGt, N, RS)
 
     logw_mn = Dict{Float64, Array{Float64,2}}()
     logW_mn = Dict{Float64, Array{Float64,2}}()
     Xt = Dict{Float64, Array{Float64,1}}()
     Xtp1 = Dict{Float64, Array{Float64,1}}()
-    times::Array{Float64,1} = keys(Mt) |> collect |> sort
 
     for k in 1:(length(times)-1)
         t = times[k]
@@ -75,13 +80,32 @@ function two_filter_smoothing_algorithm_logweights(Mt, logGt, N, RS, transition_
     return Dict("logW_mn" => logW_mn, "Xt" => Xt, "Xtp1" => Xtp1)
 end
 
+function two_filter_smoothing_algorithm_logweights(Mt, logGt, N, RS, transition_logdensity::Function, logγ::Function)
+    #For simplicity, logγ is the invariant logdensity of the process
+    #transition_logdensity(Xt+1, Xt, Δtp1) is the transition logdensity of Xt+1 given Xt
+    particle_filter = generic_particle_filtering_logweights(Mt, logGt, N, RS)
+    information_filter = generic_particle_information_filter_logweights(Mt, logGt, N, RS)
+    times::Array{Float64,1} = keys(Mt) |> collect |> sort
+
+    return common_part_two_filter_smoother_with_or_without_resampling(transition_logdensity, logγ, times, particle_filter, information_filter)
+
+end
+
+function two_filter_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, N, RS, transition_logdensity::Function, logγ::Function)
+    #For simplicity, logγ is the invariant logdensity of the process
+    #transition_logdensity(Xt+1, Xt, Δtp1) is the transition logdensity of Xt+1 given Xt
+    particle_filter = generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, N, RS)
+    information_filter = generic_particle_information_filter_adaptive_resampling_logweights(Mt, logGt, N, RS)
+    times::Array{Float64,1} = keys(Mt) |> collect |> sort
+
+    return common_part_two_filter_smoother_with_or_without_resampling(transition_logdensity, logγ, times, particle_filter, information_filter)
+
+end
+
 function two_filter_marginal_smoothing_algorithm1D(Mt, Gt, N, RS, transition_density::Function, γ::Function)
     two_filter_smoother = two_filter_smoothing_algorithm1D(Mt, Gt, N, RS, transition_density, γ)
 
     times_except_last = keys(Mt) |> collect |> sort |> x -> x[1:(end-1)]
-    #
-    # println(times)
-    # println(two_filter_smoother["W_mn"] |> keys)
 
     #Marginal weights are the sum over the Xt+1, i.e. sum of the weights along m, the first dimension
     W = Dict(zip(times_except_last, (sum(two_filter_smoother["W_mn"][t]; dims = 1) |> vec for t in times_except_last)))
@@ -93,9 +117,17 @@ function two_filter_marginal_smoothing_algorithm_logweights(Mt, logGt, N, RS, tr
     two_filter_smoother = two_filter_smoothing_algorithm_logweights(Mt, logGt, N, RS, transition_logdensity, logγ)
 
     times_except_last = keys(Mt) |> collect |> sort |> x -> x[1:(end-1)]
-    #
-    # println(times)
-    # println(two_filter_smoother["W_mn"] |> keys)
+
+    #Marginal weights are the sum over the Xt+1, i.e. sum of the weights along m, the first dimension
+    logW = Dict(zip(times_except_last, ([logsumexp(two_filter_smoother["logW_mn"][t][:,n]) for n in 1:N] for t in times_except_last)))
+
+    return Dict("Xt" => two_filter_smoother["Xt"], "logW" =>  logW)
+end
+
+function two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, N, RS, transition_logdensity::Function, logγ::Function)
+    two_filter_smoother = two_filter_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, N, RS, transition_logdensity, logγ)
+
+    times_except_last = keys(Mt) |> collect |> sort |> x -> x[1:(end-1)]
 
     #Marginal weights are the sum over the Xt+1, i.e. sum of the weights along m, the first dimension
     logW = Dict(zip(times_except_last, ([logsumexp(two_filter_smoother["logW_mn"][t][:,n]) for n in 1:N] for t in times_except_last)))
