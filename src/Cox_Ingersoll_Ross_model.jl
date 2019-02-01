@@ -14,13 +14,24 @@ end
 function create_transition_kernels_CIR(data, δ, γ, σ)
     function create_Mt(Δt)
         function Mt(X)
-    #         Aind = DualOptimalFiltering.indices_from_multinomial_sample_slow(A)
             return rCIR.(1, Δt, X, δ, γ, σ)
         end
         return Mt
     end
     prior = Gamma(δ/2, σ^2/γ)#parameterisation shape scale
     return create_transition_kernels(data, create_Mt, prior)
+end
+
+function create_backward_transition_kernels_CIR(data, δ, γ, σ)
+    function create_Mt(Δt)
+        function Mt(X)
+    #         Aind = DualOptimalFiltering.indices_from_multinomial_sample_slow(A)
+            return rCIR.(1, Δt, X, δ, γ, σ)
+        end
+        return Mt
+    end
+    prior = Gamma(δ/2, σ^2/γ)#parameterisation shape scale
+    return create_backward_transition_kernels(data, create_Mt, prior)
 end
 
 function create_potential_functions_CIR(data)
