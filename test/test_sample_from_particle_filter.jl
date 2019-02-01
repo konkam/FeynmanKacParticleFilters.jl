@@ -81,5 +81,12 @@
     pf_adaptive_logweights_dict = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, Nparts, RS)
     @test length(FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights(pf_adaptive_logweights_dict, 10, 2)) == 10
 
+    transition_logdensity_CIR(Xtp1, Xt, Δtp1) = FeynmanKacParticleFilters.CIR_transition_logdensity(Xtp1, Xt, Δtp1, δ, γ, σ)
+    CIR_invariant_logdensity(X) = FeynmanKacParticleFilters.CIR_invariant_logdensity(X, δ, γ, σ)
+    pf =    FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
+
+    @test_nowarn FeynmanKacParticleFilters.sample_from_filter_logweights(pf, 10, 2)
+    @test_nowarn FeynmanKacParticleFilters.sample_from_smoothing_distributions_logweights(pf, 10, 2)
+
 
 end
