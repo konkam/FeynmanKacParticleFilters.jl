@@ -9,4 +9,4 @@ using FeynmanKacParticleFilters
 @time include("test_marginal_likelihood.jl")
 @time include("test_sample_from_particle_filter.jl")
 @time include("test_CIR_functions.jl")
-@time include("test_two_filter_smoothing_algorithm.jl")
+@time include("test_generic_two_filters_smoothing_algorithm.jl")
