@@ -1,3 +1,10 @@
+# function generic_particle_information_filter1D(backward_Mt, Gt, N, RS)
+#
+#     res = generic_particle_filtering1D(backward_Mt, Gt, N, RS)
+#     return Dict("w" => res["w"][:,end:-1:1], "W" => res["W"][:,end:-1:1], "X" => res["X"][:,end:-1:1])
+#
+# end
+
 function generic_particle_information_filter1D(Mt, Gt, N, RS)
 
     res = generic_particle_filtering1D(reverse_time_in_dict_except_first(Mt), reverse_time_in_dict(Gt), N, RS)
@@ -9,6 +16,29 @@ function generic_particle_information_filter_logweights(Mt, logGt, N, RS)
 
     res =  generic_particle_filtering_logweights(reverse_time_in_dict_except_first(Mt), reverse_time_in_dict(logGt), N, RS)
     return Dict("logw" => res["logw"][:,end:-1:1], "logW" => res["logW"][:,end:-1:1], "X" => reverse_time_in_dict(res["X"]))
+
+end
+
+function generic_particle_information_filter_logweightsV2(backward_Mt, backward_logGt, N, RS)
+
+    times::Array{Float64, 1} = backward_Mt |> keys |> collect |> sort
+    Ntimes = length(times)
+    X = Dict()
+    logw = Array{Float64, 1}(undef, N)
+    backward_logW = Array{Float64, 2}(undef, N, Ntimes)
+    A = Array{Int64, 1}(undef, N)
+    X[Ntimes] = backward_Mt[times[Ntimes]].(1:N)
+    logw =  backward_logGt[times[Ntimes]].(X[Ntimes])
+    backward_logW[:,Ntimes] = logw .- StatsFuns.logsumexp(logw)
+
+    #Filtering
+    for t in (Ntimes-1):-1:1
+        A::Array{Int64, 1} = RS(exp.(backward_logW[:,t+1]))
+        X[t] = backward_Mt[times[t]].(X[t+1][A])
+        logw = backward_logGt[times[t]].(X[t])
+        backward_logW[:,t] = logw .- StatsFuns.logsumexp(logw)
+    end
+    return Dict("backward_logW" => backward_logW, "logW" => backward_logW, "X" => X)
 
 end
 
@@ -91,6 +121,17 @@ function two_filter_smoothing_algorithm_logweights(Mt, logGt, N, RS, transition_
 
 end
 
+function two_filter_smoothing_algorithm_logweightsV2(Mt, backward_Mt, logGt, backward_logGt, N, RS, transition_logdensity::Function, logγ::Function)
+    #For simplicity, logγ is the invariant logdensity of the process
+    #transition_logdensity(Xt+1, Xt, Δtp1) is the transition logdensity of Xt+1 given Xt
+    particle_filter = generic_particle_filtering_logweights(Mt, logGt, N, RS)
+    information_filter = generic_particle_information_filter_logweightsV2(backward_Mt, backward_logGt, N, RS)
+    times::Array{Float64,1} = keys(Mt) |> collect |> sort
+
+    return common_part_two_filter_smoother_with_or_without_resampling(transition_logdensity, logγ, times, particle_filter, information_filter)
+
+end
+
 function two_filter_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, N, RS, transition_logdensity::Function, logγ::Function)
     #For simplicity, logγ is the invariant logdensity of the process
     #transition_logdensity(Xt+1, Xt, Δtp1) is the transition logdensity of Xt+1 given Xt
@@ -119,6 +160,18 @@ end
 
 function two_filter_marginal_smoothing_algorithm_logweights(Mt, logGt, N, RS, transition_logdensity::Function, logγ::Function)
     two_filter_smoother = two_filter_smoothing_algorithm_logweights(Mt, logGt, N, RS, transition_logdensity, logγ)
+
+    ntimes = length(Mt |> keys)
+
+    #Marginal weights are the sum over the Xt+1, i.e. sum of the weights along m, the first dimension
+    logW = map(k -> vec(mapslices(logsumexp, two_filter_smoother["logW_mn"][k], dims = 1)), 1:(ntimes-1)) |>
+      x -> hcat(x...)
+
+    return Dict("X" => two_filter_smoother["Xt"], "logW" =>  logW)
+end
+
+function two_filter_marginal_smoothing_algorithm_logweightsV2(Mt, backward_Mt, logGt, backward_logGt, N, RS, transition_logdensity::Function, logγ::Function)
+    two_filter_smoother = two_filter_smoothing_algorithm_logweightsV2(Mt, backward_Mt, logGt, backward_logGt, N, RS, transition_logdensity, logγ)
 
     ntimes = length(Mt |> keys)
 

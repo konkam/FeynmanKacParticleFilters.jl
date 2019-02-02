@@ -24,9 +24,18 @@ using StatsFuns, Distributions
     logGt = FeynmanKacParticleFilters.create_log_potential_functions_CIR(data)
     RS(W) = rand(Categorical(W), length(W))
 
+    backward_Mt = FeynmanKacParticleFilters.create_backward_transition_kernels_CIR(data, δ, γ, σ)
+
+    # @test_nowarn FeynmanKacParticleFilters.generic_particle_information_filter1D(backward_Mt, Gt, Nparts, RS)
     @test_nowarn FeynmanKacParticleFilters.generic_particle_information_filter1D(Mt, Gt, Nparts, RS)
 
-    @test_nowarn FeynmanKacParticleFilters.generic_particle_information_filter_logweights(Mt, logGt, Nparts, RS)
+    Random.seed!(0)
+
+    @test_nowarn FeynmanKacParticleFilters.generic_particle_information_filter_logweights(backward_Mt, logGt, Nparts, RS)
+
+    Random.seed!(0)
+
+    @test_nowarn FeynmanKacParticleFilters.generic_particle_information_filter_logweightsV2(backward_Mt, logGt, Nparts, RS)
 
     @test_nowarn FeynmanKacParticleFilters.generic_particle_information_filter_adaptive_resampling_logweights(Mt, logGt, Nparts, RS)
 
@@ -59,6 +68,8 @@ using StatsFuns, Distributions
         @test logsumexp(res["logW_mn"][k]) ≈ 0 atol=10^(-14)
     end
 
+    @test_nowarn FeynmanKacParticleFilters.two_filter_smoothing_algorithm_logweightsV2(Mt, backward_Mt, logGt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
+
     Random.seed!(0)
 
     res =  FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm1D(Mt, Gt, 100, RS, transition_density_CIR, CIR_invariant_density)
@@ -78,6 +89,8 @@ using StatsFuns, Distributions
             @test exp(logres["logW"][k][l]) ≈ res["W"][k][l]
         end
     end
+
+    @test_nowarn FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_logweightsV2(Mt, backward_Mt, logGt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
 
     res =   FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
 
