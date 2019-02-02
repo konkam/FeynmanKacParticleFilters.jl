@@ -87,7 +87,7 @@ function generic_particle_filtering_logweights(Mt, logGt, N, RS)
 
     #Filtering
     for t in 2:length(times)
-                A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
+        A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
         X[t] = Mt[times[t]].(X[t-1][A])
         logw[:,t] = logGt[times[t]].(X[t])
         logW[:,t] = logw[:,t] .- StatsFuns.logsumexp(logw[:,t])
