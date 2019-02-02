@@ -96,7 +96,7 @@ using StatsFuns, Distributions
 
     sum_logweights_res = mapslices(logsumexp, res["logW"], dims = 1)
     for k in sum_logweights_res
-        @test k ≈ 0 atol=10^(-14)
+        @test k ≈ 0 atol=10^(-13)
     end
 
 end
