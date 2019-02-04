@@ -18,7 +18,7 @@ function generic_forward_filtering_backward_smoothing_algorithm_logweights(Mt, l
             Δt = times[k] - times[k-1]
             logSnt = logsumexp(pf_logweights["logW"][:, k-1] .+ transition_logdensity.(pf_logweights["X"][k][n], pf_logweights["X"][k-1], Δt))
             for m in 1:M
-                logWt_tp1_Tmn[m,n] = logWtT[m, k] + pf_logweights["logW"][m, k-1] + transition_logdensity(pf_logweights["X"][k][n], pf_logweights["X"][k-1][m], Δt) - logSnt
+                logWt_tp1_Tmn[m,n] = logWtT[n, k] + pf_logweights["logW"][m, k-1] + transition_logdensity(pf_logweights["X"][k][n], pf_logweights["X"][k-1][m], Δt) - logSnt
             end
         end
     end

@@ -26,6 +26,11 @@
 
     transition_logdensity_CIR(Xtp1, Xt, Δtp1) = FeynmanKacParticleFilters.CIR_transition_logdensity(Xtp1, Xt, Δtp1, δ, γ, σ)
 
-    @test_nowarn FeynmanKacParticleFilters.generic_forward_filtering_backward_smoothing_algorithm_logweights(Mt, logGt, Nparts, Nparts, RS, transition_logdensity_CIR)
+    res = FeynmanKacParticleFilters.generic_forward_filtering_backward_smoothing_algorithm_logweights(Mt, logGt, Nparts, Nparts, RS, transition_logdensity_CIR)
+
+    sum_logweights_res = mapslices(logsumexp, res["logW"], dims = 1)
+    for k in sum_logweights_res
+        @test k ≈ 0 atol=10^(-13)
+    end
 
 end;
