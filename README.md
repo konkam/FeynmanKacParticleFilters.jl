@@ -7,7 +7,7 @@
 
 A package to perform particle filtering (as well as likelihood estimation and smoothing) using the Feynman-Kac formalism.
 
-Filtering and likelihood estimation are illustrated on:
+Filtering and likelihood estimation are illustrated on two stochastic diffusion equation models:
 - The [Cox-Ingersoll-Ross](https://en.wikipedia.org/wiki/Cox%E2%80%93Ingersoll%E2%80%93Ross_model) (CIR) model
 - The K dimensional continuous Wright Fisher model (continuous time, infinite population, see Jenkins & Spanò (2017) for instance)
 
