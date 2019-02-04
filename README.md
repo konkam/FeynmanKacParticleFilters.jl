@@ -5,11 +5,13 @@
 # FeynmanKacParticleFilters
 
 
-A package to perform particle filtering (and smoothing) written using the Feynman-Kac formalism.
+A package to perform particle filtering (as well as likelihood estimation and smoothing) using the Feynman-Kac formalism.
 
-Implemented as an example:
-- [Cox-Ingersoll-Ross](https://en.wikipedia.org/wiki/Cox%E2%80%93Ingersoll%E2%80%93Ross_model) (CIR)
-- K dimensional Wright Fisher model
+Filtering and likelihood estimation are illustrated on:
+- The [Cox-Ingersoll-Ross](https://en.wikipedia.org/wiki/Cox%E2%80%93Ingersoll%E2%80%93Ross_model) (CIR) model
+- The K dimensional continuous Wright Fisher model (continuous time, infinite population, see Jenkins & Spanò (2017) for instance)
+
+*Particle smoothing for the Wright-Fisher model is not implemented for lack of a tractable form of the transition density.*
 
 Outputs:
 - Marginal likelihood
@@ -25,7 +27,7 @@ Potentially useful functions:
 - Evaluation of the transition density for the Cox-Ingersoll-Ross process (*based on the representation with the Bessel function*)
 - Random trajectory generation from the Cox-Ingersoll-Ross process (*based on the Gamma Poisson expansion of the transition density*)
 
-# Preliminary notions
+# Preliminary notions on the Feynman-Kac formalism
 
 The Feynman-Kac formalism allows to formulate different types of particle filters using the same abstract elements.
 The input of a generic particle filter are:
@@ -192,9 +194,11 @@ FeynmanKacParticleFilters.sample_from_smoothing_distributions_logweights(pf, n_s
 ```
 
 **References:**
+- Briers, M., Doucet, A. and Maskell, S. *Smoothing algorithms for state–space models.* Annals of the Institute of Statistical Mathematics 62.1 (2010): 61.  
 
 - Chopin, N. & Papaspiliopoulos, O. *A concise introduction to Sequential Monte Carlo*, to appear.
+
 - Del Moral, P. (2004). *Feynman-Kac formulae. Genealogical and interacting particle
-systems with applications.* Probability and its Applications. Springer Verlag, New
-York.  
-- Briers, M., Doucet, A. and Maskell, S. *Smoothing algorithms for state–space models.* Annals of the Institute of Statistical Mathematics 62.1 (2010): 61.
+systems with applications.* Probability and its Applications. Springer Verlag, New York.    
+
+- Jenkins, P. A., & Spanò, D. (2017). Exact simulation of the Wright--Fisher diffusion. The Annals of Applied Probability, 27(3), 1478–1509.
