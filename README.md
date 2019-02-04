@@ -18,11 +18,12 @@ Outputs:
 
 Implemented:
 - Bootstrap particle filter with adaptive resampling.  
-- Two-filter particle smoother
+- Forward Filtering Backward Smoothing (FFBS) algorithm
+- Two-filter particle smoother (not ready yet)
 
 Potentially useful functions:
-- Evaluation of the transition density for the Cox-Ingersoll-Ross process
-- Random trajectory generation from the Cox-Ingersoll-Ross process
+- Evaluation of the transition density for the Cox-Ingersoll-Ross process (*based on the representation with the Bessel function*)
+- Random trajectory generation from the Cox-Ingersoll-Ross process (*based on the Gamma Poisson expansion of the transition density*)
 
 # Preliminary notions
 
@@ -118,7 +119,7 @@ Running the boostrap filter algorithm is performed as follows:
 pf = FeynmanKacParticleFilters.generic_particle_filtering_logweights1D(Mt, logGt, Nparts, RS)
 ```
 
-To sample `nsample` values from the i-th filtering distributions, do:
+To sample `nsamples` values from the i-th filtering distributions, do:
 
 ```julia
 n_samples = 100
@@ -135,9 +136,38 @@ FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf, n
 
  ## Smoothing
 
- To perform a simple particle smoothing on the CIR process using the two-filter algorithm, we additionally need:
- - a sequence of distributions $\gamma_t$ for t=0:T, such that the Radon-Nikodym derivative \ganna_T/M_0 exists and may be computed pointwise   (we take the prior distribution on the last state for the information filter to be the prior distribution on the first state in the particle filter). Briers et al. (2010) suggest that the invariant density of the CIR process may be used for all distributions in the sequence.
- - a function which evaluates the transition density of the CIR process.
+### Forward Filtering Backward Smoothing (FFBS)
+ To perform a simple particle smoothing on the CIR process using the FFBS algorithm, we additionally need a function which evaluates the transition density of the CIR process.
+
+ ```julia
+ transition_logdensity_CIR(Xtp1, Xt, Δtp1) = FeynmanKacParticleFilters.CIR_transition_logdensity(Xtp1, Xt, Δtp1, δ, γ, σ)
+ ```
+
+With the transition density, we can obtain the FFBS filter:
+
+```julia
+ps = FeynmanKacParticleFilters.generic_forward_filtering_backward_smoothing_algorithm_logweights(Mt, logGt, Nparts, Nparts, RS, transition_logdensity_CIR)
+```
+
+
+To sample `nsamples` values from the i-th smoothing distribution, do:
+
+```julia
+n_samples = 100
+i = 4
+FeynmanKacParticleFilters.sample_from_smoothing_distributions_logweights(ps, n_samples, i)
+100-element Array{Float64,1}:
+ 7.134633585387236
+ 2.513540876531395
+ 5.0555536713845814
+ 7.983322471825221
+ 4.651221100411266
+ ⋮
+```
+
+ ### Two-filter particle smoothing
+
+To perform particle smoothing on the CIR process using the two-filter algorithm, in addition to a tractable for for the transition density, we need a sequence of distributions $\gamma_t$ for t=0:T, such that the Radon-Nikodym derivative \ganna_T/M_0 exists and may be computed pointwise   (we take the prior distribution on the last state for the information filter to be the prior distribution on the first state in the particle filter). Briers et al. (2010) suggest that the invariant density of the CIR process may be used for all distributions in the sequence.
 
  ```julia
  CIR_invariant_logdensity(X) = FeynmanKacParticleFilters.CIR_invariant_logdensity(X, δ, γ, σ)
@@ -148,7 +178,7 @@ FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf, n
 With these two additional ingredients, we can obtain the two-filter smoother for the CIR process and sample from it:
 
 ```julia
-pf = FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
+ps = FeynmanKacParticleFilters.two_filter_marginal_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
 n_samples = 100
 i = 4
 FeynmanKacParticleFilters.sample_from_smoothing_distributions_logweights(pf, n_samples, i)
