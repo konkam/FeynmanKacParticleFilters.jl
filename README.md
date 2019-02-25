@@ -21,7 +21,7 @@ Outputs:
 Implemented:
 - Bootstrap particle filter with adaptive resampling.  
 - Forward Filtering Backward Smoothing (FFBS) algorithm
-- Two-filter particle smoother (not ready yet)
+<!-- - Two-filter particle smoother (not ready yet) -->
 
 Potentially useful functions:
 - Evaluation of the transition density for the Cox-Ingersoll-Ross process (*based on the representation with the Bessel function*)
@@ -118,7 +118,7 @@ Running the boostrap filter algorithm is performed as follows:
 
 
 ```julia
-pf = FeynmanKacParticleFilters.generic_particle_filtering_logweights1D(Mt, logGt, Nparts, RS)
+pf = FeynmanKacParticleFilters.generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, Nparts, RS)
 ```
 
 To sample `nsamples` values from the i-th filtering distributions, do:
@@ -126,7 +126,7 @@ To sample `nsamples` values from the i-th filtering distributions, do:
 ```julia
 n_samples = 100
 i = 4
-FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights1D(pf, n_samples, i)
+FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights(pf, n_samples, i)
 100-element Array{Float64,1}:
   5.371960182098351
   5.371960182098351
@@ -167,7 +167,7 @@ FeynmanKacParticleFilters.sample_from_smoothing_distributions_logweights(ps, n_s
  ⋮
 ```
 
- ### Two-filter particle smoothing
+ <!-- ### Two-filter particle smoothing
 
 To perform particle smoothing on the CIR process using the two-filter algorithm, in addition to a tractable for for the transition density, we need a sequence of distributions $\gamma_t$ for t=0:T, such that the Radon-Nikodym derivative \ganna_T/M_0 exists and may be computed pointwise   (we take the prior distribution on the last state for the information filter to be the prior distribution on the first state in the particle filter). Briers et al. (2010) suggest that the invariant density of the CIR process may be used for all distributions in the sequence.
 
@@ -191,7 +191,7 @@ FeynmanKacParticleFilters.sample_from_smoothing_distributions_logweights(pf, n_s
  3.3924167451813956
  6.181638161092906
  ⋮
-```
+``` -->
 
 **References:**
 - Briers, M., Doucet, A. and Maskell, S. *Smoothing algorithms for state–space models.* Annals of the Institute of Statistical Mathematics 62.1 (2010): 61.  
