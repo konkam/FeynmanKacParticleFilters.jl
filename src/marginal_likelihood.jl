@@ -25,7 +25,6 @@ end
 function marginal_loglikelihood_factors(particle_filter_output_logweights)
     logw = particle_filter_output_logweights["logw"]
     N = size(logw,1)
-    mapslices(StatsFuns.logsumexp, logw, dims = 1)
     return vec(mapslices(StatsFuns.logsumexp, logw, dims = 1) .- log(N))
 end
 
