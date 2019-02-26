@@ -1,4 +1,4 @@
-function generic_forward_filtering_backward_smoothing_algorithm_logweights(Mt, logGt, M, N, RS, transition_logdensity::Function)
+function generic_FFBS_algorithm_logweights(Mt, logGt, M, N, RS, transition_logdensity::Function)
     times::Array{Float64, 1} = Mt |> keys |> collect |> sort
     Ntimes = length(times)
     pf_logweights = generic_particle_filtering_logweights(Mt, logGt, N, RS)

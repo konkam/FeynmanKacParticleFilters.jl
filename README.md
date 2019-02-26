@@ -148,7 +148,7 @@ FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights(pf, n_s
 With the transition density, we can obtain the FFBS filter:
 
 ```julia
-ps = FeynmanKacParticleFilters.generic_forward_filtering_backward_smoothing_algorithm_logweights(Mt, logGt, Nparts, Nparts, RS, transition_logdensity_CIR)
+ps = FeynmanKacParticleFilters.generic_FFBS_algorithm_logweights(Mt, logGt, Nparts, Nparts, RS, transition_logdensity_CIR)
 ```
 
 

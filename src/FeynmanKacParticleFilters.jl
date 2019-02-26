@@ -10,5 +10,5 @@ include("common_utility_functions.jl")
 include("create_transition_kernels.jl")
 include("create_potential_functions.jl")
 include("generic_two_filters_smoothing_algorithm.jl")
-include("generic_forward_filtering_backward_smoothing_algorithm.jl")
+include("generic_FFBS_algorithm.jl")
 end # module
