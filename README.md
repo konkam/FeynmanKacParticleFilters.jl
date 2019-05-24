@@ -20,7 +20,7 @@ Outputs:
 
 Implemented:
 - Bootstrap particle filter with adaptive resampling.  
-- Forward Filtering Backward Smoothing (FFBS) algorithm
+- Forward Filtering Backward Sampling (FFBS) algorithm
 <!-- - Two-filter particle smoother (not ready yet) -->
 
 Potentially useful functions:
@@ -138,7 +138,7 @@ FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights(pf, n_s
 
  ## Smoothing
 
-### Forward Filtering Backward Smoothing (FFBS)
+### Forward Filtering Backward Sampling (FFBS)
  To perform a simple particle smoothing on the CIR process using the FFBS algorithm, we additionally need a function which evaluates the transition density of the CIR process.
 
  ```julia
