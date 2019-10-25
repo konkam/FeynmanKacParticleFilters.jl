@@ -70,8 +70,24 @@ function CIR_transition_density_param_iacus_cuvq(c::Real, u::Real, v::Real, q::R
     return exp(CIR_transition_logdensity_param_iacus_cuvq(c, u, v, q))
 end
 
-function CIR_transition_logdensity_param_iacus_cuvq(c::Real, u::Real, v::Real, q::Real)
+CIR_transition_logdensity_param_iacus_cuvq(c::Real, u::Real, v::Real, q::Real) = CIR_transition_logdensity_param_iacus_cuvq_scaled_bessel(c::Real, u::Real, v::Real, q::Real)
+
+
+function CIR_transition_logdensity_param_iacus_cuvq_unstable(c::Real, u::Real, v::Real, q::Real)
+
+    # This turned out not to be exceptionally numerically stable, overflow problem in the besseli function.
+
     return log(c) -(u+v) + q/2 * log(v/u) + log(besseli(q, 2*sqrt(u*v)))
+
+end
+
+
+function CIR_transition_logdensity_param_iacus_cuvq_scaled_bessel(c::Real, u::Real, v::Real, q::Real)
+
+    # Maybe a more stable version, solution suggested in https://github.com/JuliaStats/Distributions.jl/issues/808.
+    # Benchmarking times seem to show that besseli and besselix*exp(x) are mostly similar
+
+    return log(c) -(u+v) + q/2 * log(v/u) + log(besselix(q, 2*sqrt(u*v))) + 2*sqrt(u*v)
 end
 
 function u_iacus(c::Real, x0::Real, θ2::Real, t::Real)
