@@ -11,6 +11,8 @@
 
     @test FeynmanKacParticleFilters.CIR_transition_logdensity_param_iacus_cuvq_unstable(5, 6, 7, 8) ≈ FeynmanKacParticleFilters.CIR_transition_logdensity_param_iacus_cuvq_scaled_bessel(5, 6, 7, 8)
 
+    @test_nowarn FeynmanKacParticleFilters.CIR_transition_logdensity_param_iacus_cuvq(5, 6, 7, 8)
+
     Random.seed!(0)
 
     Δt = 0.1
