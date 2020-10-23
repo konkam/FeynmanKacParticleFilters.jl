@@ -1,7 +1,7 @@
 name = "FeynmanKacParticleFilters"
 uuid = "b43f8e06-e683-11e8-294f-8d3ef32cb08c"
 authors = ["konkam <guillaume.konkamking.work@gmail.com>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
