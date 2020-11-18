@@ -4,10 +4,6 @@ os:
 julia:
   - 1
   - 1.5
-  - nightly
-matrix:
-  allow_failures:
-    - julia: nightly
 codecov: true
 coveralls: true
 
