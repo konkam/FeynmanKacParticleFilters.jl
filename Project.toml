@@ -12,6 +12,6 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Distributions = "0.24 - 0.30"
-SpecialFunctions = "0.9.0 - 0.30"
+SpecialFunctions = "0.9.0 - 0.30, 1.0"
 StatsFuns = "0.9.5 - 0.20"
 julia = "^1"
