@@ -65,7 +65,7 @@ using StatsFuns, Distributions
     res =  FeynmanKacParticleFilters.two_filter_smoothing_algorithm_adaptive_resampling_logweights(Mt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
 
     for k in keys(res["logW_mn"])
-        @test logsumexp(res["logW_mn"][k]) ≈ 0 atol=10^(-14)
+        @test logsumexp(res["logW_mn"][k]) ≈ 0 atol=10^(-13)
     end
 
     @test_nowarn FeynmanKacParticleFilters.two_filter_smoothing_algorithm_logweightsV2(Mt, backward_Mt, logGt, logGt, 100, RS, transition_logdensity_CIR, CIR_invariant_logdensity)
