@@ -4,7 +4,10 @@ os:
 julia:
   - 1
   - 1.5
+<<<<<<< HEAD
   
+=======
+>>>>>>> bacea33f2847d6a978fd51a2a2bbfa3698d25b8b
 codecov: true
 coveralls: true
 
