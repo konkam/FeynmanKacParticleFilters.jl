@@ -1,7 +1,7 @@
 name = "FeynmanKacParticleFilters"
 uuid = "b43f8e06-e683-11e8-294f-8d3ef32cb08c"
 authors = ["konkam <guillaume.konkamking.work@gmail.com>"]
-version = "0.1.3"
+version = "0.1.4"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
@@ -11,7 +11,7 @@ StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-Distributions = "0.24 - 0.30"
+Distributions = "0.20 - 0.30"
 SpecialFunctions = "0.9.0 - 0.30, 1.0"
 StatsFuns = "0.9.5 - 0.20"
 julia = "^1"
