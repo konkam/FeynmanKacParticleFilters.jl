@@ -60,19 +60,14 @@ pkg> add https://github.com/konkam/FeynmanKacParticleFilters.jl
 ```
 
 # How to use the package (Example with the CIR model)
-<!-- P_t(x, dx') = \sum_{k \ge 0}\text{Poisson}(k, \frac{\gamma}{\sigma^2}\frac{1}{e^{2\gamma t}-1}x)\text{Ga}\left(k+\delta/2,  \frac{\gamma}{\sigma^2}\frac{e^{2\gamma t}}{e^{2\gamma t}-1}\right ) -->
-
 The transition density of the 1-D CIR process is available as:
 
-
-<img src="Latex_equations/CIR_trans.gif" width="450">
+$$P_t(x, dx') = \sum_{k \ge 0}\text{Poisson}\left(k, \frac{\gamma}{\sigma^2}\frac{1}{e^{2\gamma t}-1}x\right)\text{Ga}\left(k+\delta/2,  \frac{\gamma}{\sigma^2}\frac{e^{2\gamma t}}{e^{2\gamma t}-1}\right)$$
 
 from which it easy to simulate.
 Moreover, we consider a Poisson distribution as the emission density:
 
-<!-- f_t(y_t|x_t) = \frac{x_t^{y_t}}{y_t!}e^{-x_t} -->
-
-<img src="Latex_equations/poisson_dens.gif" width="150">
+$$f_t(y_t|x_t) = \frac{x_t^{y_t}}{y_t!}e^{-x_t}$$
 
 
 We start by simulating some data (a function to simulate from the transition density is available in the package):
