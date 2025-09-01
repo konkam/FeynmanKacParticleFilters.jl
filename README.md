@@ -23,7 +23,7 @@ Implemented:
 - Forward Filtering Backward Sampling (FFBS) algorithm
 <!-- - Two-filter particle smoother (not ready yet) -->
 
-Potentially useful functions:
+Potentially useful functions to be found in the package:
 - Evaluation of the transition density for the Cox-Ingersoll-Ross process (*based on the representation with the Bessel function*)
 - Random trajectory generation from the Cox-Ingersoll-Ross process (*based on the Gamma Poisson expansion of the transition density*)
 
@@ -40,14 +40,14 @@ The input of a generic particle filter are:
 
 For adaptive resampling, one needs in addition:
 - a scalar <img src="Latex_equations/ess.gif" width="90">
+Using this formalism, the bootstrap filter is expressed as:
 
-Using this formalism, the boostrap filter is expressed as:  
-- G_0(x_0) = f_0(y_0|x_0), where f is the emission density
-- G_t(x_t-1, x_t) = f_0(y_t|x_t)  
-- M_0(dx0) = P_0(dx0) the prior on the hidden state  
-- M_t(x_t-1, dxt) = P_t(x_t-1, dxt) given by the transition function
+- $G_0(x_0) = f_0\bigl(y_0 \mid x_0\bigr)$, where $f$ is the emission density.  
+- $G_t(x_{t-1}, x_t) = f_t\bigl(y_t \mid x_t\bigr)$ for $t\ge 1$.  
+- \(M_0(dx_0) = P_0(dx_0)\), the prior on the hidden state.  
+- \(M_t(x_{t-1}, dx_t) = P_t\bigl(x_{t-1}, dx_t\bigr)\), given by the transition kernel.
 
-
+The generic framework of Feynman-Kac models allows to implement particle filtering in an abstract way, independently of the specific nature of the state space or the transition kernel. The potential functions G_t are only required to be evaluable on any state, and the transition kernels M_t to accept a state as input and return another state as output.
 
 # How to install the package
 
