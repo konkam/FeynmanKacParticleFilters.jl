@@ -24,28 +24,30 @@ Implemented:
 <!-- - Two-filter particle smoother (not ready yet) -->
 
 Potentially useful functions to be found in the package:
-- Evaluation of the transition density for the Cox-Ingersoll-Ross process (*based on the representation with the Bessel function*)
-- Random trajectory generation from the Cox-Ingersoll-Ross process (*based on the Gamma Poisson expansion of the transition density*)
+- Evaluation of the transition density for the Cox-Ingersoll-Ross process (*based on the representation with the Bessel function*)  
+- Random trajectory generation from the Cox-Ingersoll-Ross process (*based on the Gamma Poisson expansion of the transition density*) 
 
 # Preliminary notions on the Feynman-Kac formalism
 
 The Feynman-Kac formalism allows to formulate different types of particle filters using the same abstract elements.
 The input of a generic particle filter are:
 
-- A Feynman-Kac model M_t, G_t, where:  
-  - G_t is a potential function which can be evaluated for all values of t  
-  - It is possible to simulate from M_0(dx0) and M_t(x_t-1, dxt)  
-- The number of particles N  
-- The choice of an unbiased resampling scheme (e.g. multinomial), i.e. an algorithm to draw variables <img src="Latex_equations/rs.gif" width="90"> in 1:N where RS is a distribution such that: <img src="Latex_equations/expect.gif" width="120">.
+- A Feynman-Kac model $M_t, G_t$, where:  
+  - $G_t$ is a potential function which can be evaluated for all values of $t$  
+  - It is possible to simulate from $M_0(dx_0)$ and $M_t(x_{t-1}, dx_t)$  
+- The number of particles $N$  
+- The choice of an unbiased resampling scheme (e.g. multinomial), i.e. an algorithm to draw variables $A_t^{1:N} \sim RS\left(W_{t-1}^{1:N}\right)$ in $1:N$ where $RS$ is a distribution such that: $\mathbb{E}\left[\sum_{m=1}^N \delta\left(A_t^m=n\right)\right] = W_{t-1}^n$.
 
 For adaptive resampling, one needs in addition:
-- a scalar <img src="Latex_equations/ess.gif" width="90">
+- a scalar $ESS_{\min} \ge 0$
+
+
 Using this formalism, the bootstrap filter is expressed as:
 
 - $G_0(x_0) = f_0\bigl(y_0 \mid x_0\bigr)$, where $f$ is the emission density.  
 - $G_t(x_{t-1}, x_t) = f_t\bigl(y_t \mid x_t\bigr)$ for $t\ge 1$.  
-- \(M_0(dx_0) = P_0(dx_0)\), the prior on the hidden state.  
-- \(M_t(x_{t-1}, dx_t) = P_t\bigl(x_{t-1}, dx_t\bigr)\), given by the transition kernel.
+- $M_0(dx_0) = P_0(dx_0)$, the prior on the hidden state.  
+- $M_t(x_{t-1}, dx_t) = P_t\bigl(x_{t-1}, dx_t\bigr)$, given by the transition kernel.
 
 The generic framework of Feynman-Kac models allows to implement particle filtering in an abstract way, independently of the specific nature of the state space or the transition kernel. The potential functions G_t are only required to be evaluable on any state, and the transition kernels M_t to accept a state as input and return another state as output.
 
