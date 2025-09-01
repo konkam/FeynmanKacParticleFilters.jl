@@ -103,7 +103,7 @@ data = zip(times, Y) |> Dict
 
 ## Filtering
 
-Now we define the (log)potential function Gt,  a simulator from the transition kernel for the Cox-Ingersoll-Ross model and a resampling scheme (here multinomial):
+Now we define the (log)potential function Gt,  a simulator from the transition kernel for the Cox-Ingersoll-Ross model (we use convenience functions to create all potentials and kernels) and a resampling scheme (here multinomial):
 
 ```julia
 Mt = FeynmanKacParticleFilters.create_transition_kernels_CIR(data, δ, γ, σ)
