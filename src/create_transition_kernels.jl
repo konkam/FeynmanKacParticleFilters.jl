@@ -2,8 +2,10 @@
 """
     create_transition_kernels(data, transition_kernel, prior)
 
-Creates a dictionary with observation times as keys and transition kernels as values. This assumes that the transition kernel only depends on the difference between observation times. Values are functions which take a state as argument and return a random state obtained through the transition kernel.
-
+Creates a dictionary with observation times as keys and transition kernels as values. 
+This assumes that the transition kernel only depends on the difference between observation times. 
+Values are functions which take a state as argument and return a random state obtained through the transition kernel.
+No assumptions are made on the states.
 
 # Arguments
 - `data::Dict{Real, Any}`: keys are observation times, values are observed data.
