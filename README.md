@@ -51,6 +51,44 @@ Using this formalism, the bootstrap filter is expressed as:
 
 The generic framework of Feynman-Kac models allows to implement particle filtering in an abstract way, independently of the specific nature of the state space or the transition kernel. The potential functions G_t are only required to be evaluable on any state, and the transition kernels M_t to accept a state as input and return another state as output.
 
+
+### Generic Feynman–Kac filtering — pseudocode 
+
+Input:
+- Mt: sequence of transition simulators (Mt[1]() ~ M0, Mt[t](x) ~ M_t(x,·) for t>=2)
+- Gt: sequence of potential functions (Gt[1](x0), Gt[t](x_{t-1},x_t)) that return non-negative weights
+- N: number of particles
+- RS(W): resampling routine that returns N ancestor indices given normalized linear weights W
+- ESS_min_frac: fraction of N below which to resample (optional)
+
+Output:
+- particles[t][i]: particle i at time t
+- W[t][i]: normalized (linear) weights at time t
+- Z: estimate of marginal likelihood (linear scale)
+
+Procedure:
+1. Helpers:
+   - normalize(w): W = w / sum(w)
+   - ESS(W): 1 / sum(W^2)
+
+2. Initialization (t = 1)
+   - For i in 1..N: particles[1][i] = Mt[1]()                   # sample from prior M0
+   - For i in 1..N: w[i] = Gt[1](particles[1][i])               # non-negative potentials
+   - Z = mean(w)                                              # incremental marginal likelihood
+   - W[1] = normalize(w)
+
+3. For t = 2..T:
+   - Wprev = W[t-1]
+   - If ESS(Wprev) < ESS_min_frac * N:
+       - ancestors = RS(Wprev)                                # length N
+       - For i in 1..N: particles[t-1][i] = particles[t-1][ancestors[i]]
+       - Wprev = [1/N] * N                                    # uniform after resampling
+   - For i in 1..N: particles[t][i] = Mt[t](particles[t-1][i]) # propagate
+   - For i in 1..N: w[i] = Gt[t](particles[t-1][i], particles[t][i])  # incremental weights
+   - W[t] = normalize(w)
+
+4. Return (particles, W, Z)
+
 # How to install the package
 
 Press `]` in the Julia interpreter to enter the Pkg mode and input:
