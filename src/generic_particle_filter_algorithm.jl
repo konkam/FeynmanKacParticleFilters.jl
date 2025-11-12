@@ -236,7 +236,7 @@ function generic_particle_filtering_adaptive_resampling_logweights(Mt, logGt, N,
 
     #Filtering
     for t in 2:length(times)
-                if logESS(logW[:,t-1]) < logESSmin
+        if logESS(logW[:,t-1]) < logESSmin
             A::Array{Int64, 1} = RS(exp.(logW[:,t-1]))
             logŵ .= 0.
             resampled[t] = true
