@@ -57,7 +57,7 @@ The generic framework of Feynman-Kac models allows to implement particle filteri
 Input:  
 
 - `Mt`: sequence of transition simulators `(Mt[1]() ~ M0, Mt[t](x) ~ M_t(x,·) for t>=2)`  
-- `Gt`: sequence of potential functions `(Gt[1](x0), Gt[t](x_{t-1},x_t)) that return non-negative weights 
+- `Gt`: sequence of potential functions `(Gt[1](x0), Gt[t](x_{t-1},x_t))` that return non-negative weights 
 - `N`: number of particles  
 - `RS(W)`: resampling routine that returns N   ancestor indices given normalized linear weights W  
 - `ESS_min_frac`: fraction of N below which to resample (optional)  
