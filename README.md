@@ -52,19 +52,20 @@ Using this formalism, the bootstrap filter is expressed as:
 The generic framework of Feynman-Kac models allows to implement particle filtering in an abstract way, independently of the specific nature of the state space or the transition kernel. The potential functions G_t are only required to be evaluable on any state, and the transition kernels M_t to accept a state as input and return another state as output.
 
 
-### Generic Feynman–Kac filtering — pseudocode 
+### Generic Feynman–Kac filtering with adaptive resampling — pseudocode 
 
-Input:
-- Mt: sequence of transition simulators (Mt[1]() ~ M0, Mt[t](x) ~ M_t(x,·) for t>=2)
-- Gt: sequence of potential functions (Gt[1](x0), Gt[t](x_{t-1},x_t)) that return non-negative weights
-- N: number of particles
-- RS(W): resampling routine that returns N ancestor indices given normalized linear weights W
-- ESS_min_frac: fraction of N below which to resample (optional)
+Input:  
+
+- `Mt`: sequence of transition simulators `(Mt[1]() ~ M0, Mt[t](x) ~ M_t(x,·) for t>=2)`  
+- `Gt`: sequence of potential functions `(Gt[1](x0), Gt[t](x_{t-1},x_t)) that return non-negative weights 
+- `N`: number of particles  
+- `RS(W)`: resampling routine that returns N   ancestor indices given normalized linear weights W  
+- `ESS_min_frac`: fraction of N below which to resample (optional)  
 
 Output:
-- particles[t][i]: particle i at time t
-- W[t][i]: normalized (linear) weights at time t
-- Z: estimate of marginal likelihood (linear scale)
+- `particles[t][i]`: particle i at time t
+- `W[t][i]`: normalized (linear) weights at time t
+- `Z`: estimate of marginal likelihood (linear scale)
 
 Procedure:
 1. Helpers:
@@ -72,22 +73,22 @@ Procedure:
    - ESS(W): 1 / sum(W^2)
 
 2. Initialization (t = 1)
-   - For i in 1..N: particles[1][i] = Mt[1]()                   # sample from prior M0
-   - For i in 1..N: w[i] = Gt[1](particles[1][i])               # non-negative potentials
-   - Z = mean(w)                                              # incremental marginal likelihood
-   - W[1] = normalize(w)
+   - For i in 1..N: `particles[1][i] = Mt[1]()`                   # sample from prior M0
+   - For i in 1..N: `w[i] = Gt[1](particles[1][i])`               # non-negative potentials
+   - `Z = mean(w)`                                              # incremental marginal likelihood
+   - `W[1] = normalize(w)`
 
 3. For t = 2..T:
-   - Wprev = W[t-1]
-   - If ESS(Wprev) < ESS_min_frac * N:
-       - ancestors = RS(Wprev)                                # length N
-       - For i in 1..N: particles[t-1][i] = particles[t-1][ancestors[i]]
-       - Wprev = [1/N] * N                                    # uniform after resampling
-   - For i in 1..N: particles[t][i] = Mt[t](particles[t-1][i]) # propagate
-   - For i in 1..N: w[i] = Gt[t](particles[t-1][i], particles[t][i])  # incremental weights
-   - W[t] = normalize(w)
+   - `Wprev = W[t-1]`   
+   - If `ESS(Wprev) < ESS_min_frac * N`:
+       - `ancestors = RS(Wprev)`                                # length N
+       - For i in 1..N: `particles[t-1][i] = particles[t-1][ancestors[i]]`
+       - `Wprev = [1/N] * N`                                    # uniform after resampling
+   - For i in 1..N: `particles[t][i] = Mt[t](particles[t-1][i])` # propagate
+   - For i in 1..N: `w[i] = Gt[t](particles[t-1][i], particles[t][i])`  # incremental weights
+   - `W[t] = normalize(w)`
 
-4. Return (particles, W, Z)
+4. Return `(particles, W, Z)`
 
 # How to install the package
 
@@ -171,7 +172,27 @@ FeynmanKacParticleFilters.sample_from_filtering_distributions_logweights(pf, n_s
   ⋮
 ```
 
- ## Smoothing
+
+## Likelihood estimate
+
+From the particle filter output with log-weights, you can extract the (log) marginal likelihood as follows:
+
+```julia
+# Per-time log-likelihood contributions (handles adaptive resampling correctly)
+logZ_factors = FeynmanKacParticleFilters.marginal_loglikelihood_factors_adaptive_resampling(pf)
+
+# Total log marginal likelihood
+logZ = sum(logZ_factors)
+
+# If you want the likelihood on the linear scale (may under/overflow for long T):
+Z = exp(logZ)
+
+# Alternatively, compute directly in one call:
+logZ2 = FeynmanKacParticleFilters.marginal_loglikelihood(
+    pf, FeynmanKacParticleFilters.marginal_loglikelihood_factors_adaptive_resampling)
+```
+
+## Smoothing
 
 ### Forward Filtering Backward Sampling (FFBS)
  To perform a simple particle smoothing on the CIR process using the FFBS algorithm, we additionally need a function which evaluates the transition density of the CIR process.
@@ -201,6 +222,13 @@ FeynmanKacParticleFilters.sample_from_smoothing_distributions_logweights(ps, n_s
  4.651221100411266
  ⋮
 ```
+
+
+## Transform and potential functions documentation
+
+ - Mt: a state-transform function. It accepts a state and returns a new state with the same shape. Mt implementations should be composable, i.e. you should be able to call Mt2(Mt1(state))
+ - Gt: a space-to-log-potential function. It accepts a state as input (same as Mt) and returns a scalar log-potential
+ 
 
  <!-- ### Two-filter particle smoothing
 
